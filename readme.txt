@@ -39,8 +39,8 @@ Sel commands:
 -l ( n -- ) decrement sel length by N characters
 %l ( n -- ) set absolute sel length
 
-+w ( n -- ) move sel N words forward
--w ( n -- ) move sel N words backward
++w ( n -- ) move sel N words forward - todo
+-w ( n -- ) move sel N words backward - todo
 
 /  ( t -- ) set sel to the first (from sel) longest match of regex t
 ,  ( t -- ) set sel length to the end of the first longest match of regex t
@@ -48,30 +48,30 @@ Sel commands:
 Loops and conditionals:
 
 x ( tg -- ) foreach match of t run g
-y ( tg -- ) between matches of t run g
-g ( tg -- ) if sel contains t, run g
-v ( tg -- ) if sel doesn't contain t, run g
-j ( ng -- ) if n is not a zero, run g
+y ( tg -- ) between matches of t run g - todo
+g ( tg -- ) if sel contains t, run g - todo
+v ( tg -- ) if sel doesn't contain t, run g - todo
+j ( ng -- ) if n is not a zero, run g - todo
 
 Stack operation:
 
 like in forth.
 
-dup
-drop
-swap
-nip
-rot
-tuck
-over
-roll
-pick
+dup - todo
+drop - todo
+swap - todo
+nip - todo
+rot - todo
+tuck - todo
+over - todo
+roll - todo
+pick - todo
 
 Operators:
 
-neg ( n -- n ) negates a number
+neg ( n -- n ) negates a number - todo
 
 Misc:
 
-help ( -- ) help
+help ( -- ) help - todo
 
