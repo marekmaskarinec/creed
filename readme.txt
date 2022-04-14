@@ -15,6 +15,28 @@ CREED uses go's regex, but I will write my own if I ever have time for it.
 There are 3 types in CREED - numbers, "strings" and {groups}. The syntax is
 very similar to other concatenative languages like forth.
 
+Examples:
+
+input: heaao
+command: "aa" / "ll" s
+result: hello
+
+input: ababab
+command: "b" { "c" a } x
+result: abcabcabc
+
+input:
+lorem
+ipsum
+dolor
+sit
+amet
+command: "o" { # d } x
+result:
+ipsum
+sit
+amet
+
 Command list:
 
 Editing commands:
