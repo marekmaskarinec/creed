@@ -98,10 +98,19 @@ pick - todo
 
 Operators:
 
-neg ( n -- n ) negates a number - todo
+neg ( n -- n ) negates a number
 
 Misc:
 
 help ( -- ) help - todo
 dump ( -- ) dumps the stack content to Writer
 
+
+CREED lib usage:
+
+To use CREED, you first need to create an instance. Do that using the
+NewInstance function. You need to pass it the starting buffer (which can be
+later changed) and the Writer.
+
+A creed instance then offerst the ExecCommand method, which can be used to run
+commands from a string.
