@@ -387,6 +387,15 @@ var commands = map[string]func(ins *Instance, stack *list.List) error{
 		stack.PushFront(stack.Front().Next().Value)
 		return nil
 	},
+	"neg": func(ins *Instance, stack *list.List) error {
+		n, err := popNumber(stack)
+		if err != nil {
+			return fmt.Errorf("command neg: %w", err)
+		}
+
+		stack.PushFront(n * -1)
+		return nil
+	},
 	"dump": func(ins *Instance, stack *list.List) error {
 		fmt.Fprintf(ins.Writer, "<%d> ", stack.Len())
 		for e:=stack.Front(); e != nil; e = e.Next() {
