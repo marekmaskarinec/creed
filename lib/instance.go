@@ -98,6 +98,7 @@ func (ins *Instance) selectLine() {
 		ins.Buf[ins.Sel.Index + ins.Sel.Length] != '\n' {
 		ins.Sel.Length++
 	}
+	ins.Sel.Length++
 }
 
 func (ins *Instance) moveLinesDown(n int) {
