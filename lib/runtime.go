@@ -60,6 +60,18 @@ func popGroup(stack *list.List) ([]token, error) {
 	return []token{}, errors.New("popGroup: type error")
 }
 
+func assertStackLen(stack *list.List, l int) error {
+	for n := stack.Front(); n != nil && l > 0; n = n.Next() {
+		l--
+	}
+
+	if l != 0 {
+		return fmt.Errorf("stack assertion failed")
+	}
+
+	return nil
+}
+
 func (ins *Instance) execToks(toks []token) error {
 	stack := list.List{}
 
@@ -289,6 +301,99 @@ var commands = map[string]func(ins *Instance, stack *list.List) error{
 
 		ins.moveLinesDown(n)
 		ins.selectLine()
+
+		return nil
+	},
+	"dup": func(ins *Instance, stack *list.List) error {
+		v, err := popAny(stack)
+		if err != nil {
+			return fmt.Errorf("command dup: %w", err)
+		}
+
+		stack.PushFront(v)
+		stack.PushFront(v)
+
+		return nil
+	},
+	"drop": func(ins *Instance, stack *list.List) error {
+		_, err := popAny(stack)
+		if err != nil {
+			return fmt.Errorf("command drop: %w", err)
+		}
+
+		return nil
+	},
+	"swap": func(ins *Instance, stack *list.List) error {
+		v1, err := popAny(stack)
+		if err != nil {
+			return fmt.Errorf("command swap: %w", err)
+		}
+
+		v2, err := popAny(stack)
+		if err != nil {
+			return fmt.Errorf("command swap: %w", err)
+		}
+
+		stack.PushFront(v1)
+		stack.PushFront(v2)
+
+		return nil
+	},
+	"nip": func(ins *Instance, stack *list.List) error {
+		keep, err := popAny(stack)
+		if err != nil {
+			return fmt.Errorf("commadn nip: %w", err)
+		}
+
+		_, err = popAny(stack)
+		if err != nil {
+			return fmt.Errorf("command nip: %w", err)
+		}
+
+		stack.PushFront(keep)
+
+		return nil
+	},
+	"rot": func(ins *Instance, stack *list.List) error {
+		vals := [3]interface{}{nil, nil, nil}
+		var err error
+
+		for i:=0; i < 3; i++ {
+			vals[i], err = popAny(stack)
+			if err != nil {
+				return fmt.Errorf("command rot: %w", err)
+			}
+		}
+
+		stack.PushFront(vals[1])
+		stack.PushFront(vals[0])
+		stack.PushFront(vals[2])
+
+		return nil
+	},
+	"tuck": func(ins *Instance, stack *list.List) error {
+		if err := assertStackLen(stack, 2); err != nil {
+			return fmt.Errorf("command tuck: %w", err)
+		}
+		v := stack.Front().Value
+		stack.InsertAfter(v, stack.Front().Next())
+
+		return nil
+	},
+	"over": func(ins *Instance, stack *list.List) error {
+		if err := assertStackLen(stack, 2); err != nil {
+			return fmt.Errorf("command tuck: %w", err)
+		}
+		stack.PushFront(stack.Front().Next().Value)
+		return nil
+	},
+	"dump": func(ins *Instance, stack *list.List) error {
+		fmt.Fprintf(ins.Writer, "<%d> ", stack.Len())
+		for e:=stack.Front(); e != nil; e = e.Next() {
+			fmt.Fprintf(ins.Writer, "%v ", e.Value)
+		}
+
+		fmt.Fprintf(ins.Writer, "\n")
 
 		return nil
 	},

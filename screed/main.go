@@ -26,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ins := creed.NewInstance(string(dat))
+	ins := creed.NewInstance(string(dat), os.Stderr)
 	err = ins.ExecCommand(os.Args[1])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "creed error: %v\n", err)

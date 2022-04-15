@@ -1,6 +1,7 @@
 package creed
 
 import (
+	"io"
 	"fmt"
 	"regexp"
 )
@@ -11,20 +12,25 @@ type Change struct {
 }
 
 type Instance struct {
+	// The instance's content
 	Buf []rune
+	// main sel
 	Sel Sel
 
 	// Buffer holding all changes, which is popped from upon the undo command
 	UndoBuffer []Change
+	// Writer that is written to when CREED needs to print something
+	Writer io.Writer
 }
 
-func NewInstance(src string) Instance {
+func NewInstance(src string, writer io.Writer) Instance {
 	if !commandsReady {
 		initCommands()
 	}
 
 	return Instance{
 		Buf: []rune(src),
+		Writer: writer,
 	}
 }
 

@@ -15,6 +15,9 @@ CREED uses go's regex, but I will write my own if I ever have time for it.
 There are 3 types in CREED - numbers, "strings" and {groups}. The syntax is
 very similar to other concatenative languages like forth.
 
+A CREED instance also has a Writer. The Writer is an io.Writer and is used to
+print debug information.
+
 Examples:
 
 input: heaao
@@ -75,7 +78,7 @@ Loops and conditionals:
 
 x ( tg -- ) foreach match of t inside sel, run g
 y ( tg -- ) between matches of t run g - todo
-g ( tg -- ) if sel contains t, run g - todo
+g ( tg -- ) if sel contains t, run g
 v ( tg -- ) if sel doesn't contain t, run g - todo
 j ( ng -- ) if n is not a zero, run g - todo
 
@@ -83,13 +86,13 @@ Stack operation:
 
 like in forth.
 
-dup - todo
-drop - todo
-swap - tod
-nip - todo
-rot - todo
-tuck - todo
-over - todo
+dup
+drop
+swap
+nip
+rot
+tuck
+over
 roll - todo
 pick - todo
 
@@ -100,4 +103,5 @@ neg ( n -- n ) negates a number - todo
 Misc:
 
 help ( -- ) help - todo
+dump ( -- ) dumps the stack content to Writer
 
