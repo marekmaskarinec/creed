@@ -339,7 +339,36 @@ func commandX(ins *Instance, stack *list.List) error {
 	return nil
 }
 
+func commandG(ins *Instance, stack *list.List) error {
+	g, err := popGroup(stack)
+	if err != nil {
+		return fmt.Errorf("command g: %w", err)
+	}
+
+	t, err := popString(stack)
+	if err != nil {
+		return fmt.Errorf("command g: %w", err)
+	}
+
+	re, err := regexp.Compile(t)
+	if err != nil {
+		return fmt.Errorf("command g: regex error: %w", err)
+	}
+
+	if match := re.FindStringIndex(string(ins.selSlice())); len(match) != 0 {
+		ins.Sel.Index = match[0]
+		ins.Sel.Length = match[1] - match[0]
+
+		if err := ins.execToks(g); err != nil {
+			return fmt.Errorf("command g: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func initCommands() {
 	commands["x"] = commandX
+	commands["g"] = commandG
 	commandsReady = true
 }

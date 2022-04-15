@@ -119,3 +119,7 @@ func (ins *Instance) moveLinesUp(n int) {
 
 	ins.fixSel()
 }
+
+func (ins *Instance) selSlice() []rune {
+	return ins.Buf[ins.Sel.Index:ins.Sel.Index+ins.Sel.Length]
+}

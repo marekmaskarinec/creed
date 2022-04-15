@@ -35,7 +35,7 @@ ipsum
 dolor
 sit
 amet
-command: "o" { # d } x
+command: "$" , "o" { # d } x
 result:
 ipsum
 sit
@@ -85,7 +85,7 @@ like in forth.
 
 dup - todo
 drop - todo
-swap - todo
+swap - tod
 nip - todo
 rot - todo
 tuck - todo
