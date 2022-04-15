@@ -22,8 +22,12 @@ command: "aa" / "ll" s
 result: hello
 
 input: ababab
-command: "b" { "c" a } x
+command: # "b" { "c" a } x
 result: abcabcabc
+
+input: ababab
+command: 4 +l "b" { "c" a } x
+result: abcabcab
 
 input:
 lorem
@@ -69,7 +73,7 @@ Sel commands:
 
 Loops and conditionals:
 
-x ( tg -- ) foreach match of t run g
+x ( tg -- ) foreach match of t inside sel, run g
 y ( tg -- ) between matches of t run g - todo
 g ( tg -- ) if sel contains t, run g - todo
 v ( tg -- ) if sel doesn't contain t, run g - todo

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"regexp"
 )
 
 var commandsReady = false
@@ -304,27 +305,36 @@ func commandX(ins *Instance, stack *list.List) error {
 		return fmt.Errorf("command x: %w", err)
 	}
 
-	match, err := ins.match(t)
+	re, err := regexp.Compile(t)
 	if err != nil {
-		return fmt.Errorf("command x: %w", err)
+		return fmt.Errorf("regex error: %w", err)
 	}
-	start := match[0]
+
+	oldBuf := ins.Buf
+	oldSel := ins.Sel
+	ins.Buf = make([]rune, ins.Sel.Length)
+	copy(ins.Buf, oldBuf[ins.Sel.Index:ins.Sel.Index+ins.Sel.Length])
+
+	ins.Sel.Index = 0
+	ins.Sel.Length = 0
 	for {
-		ins.Sel.Index = match[0]
+		match := re.FindStringIndex(string(ins.Buf[ins.Sel.Index+ins.Sel.Length:]))
+		if len(match) == 0 {
+			break
+		}
+
+		ins.Sel.Index = match[0] + ins.Sel.Index + ins.Sel.Length
 		ins.Sel.Length = match[1] - match[0]
 		if err := ins.execToks(g); err != nil {
 			return fmt.Errorf("command x: %w", err)
 		}
-
-		match, err = ins.match(t)
-		if err != nil {
-			return fmt.Errorf("command x: %w", err)
-		}
-
-		if len(match) == 0 || match[0] == start {
-			break
-		}
 	}
+
+	ins.Sel = oldSel
+
+	value := string(ins.Buf)
+	ins.Buf = oldBuf
+	ins.subst(ins.Sel, value)
 
 	return nil
 }
