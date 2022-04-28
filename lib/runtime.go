@@ -142,6 +142,7 @@ var commands = map[string]func(ins *Instance, stack *list.List) error{
 		}
 
 		ins.subst(Sel{ins.Sel.Index + ins.Sel.Length, 0}, str)
+		ins.Sel.Length += len(str)
 
 		return nil
 	},
@@ -152,6 +153,7 @@ var commands = map[string]func(ins *Instance, stack *list.List) error{
 		}
 
 		ins.subst(Sel{ins.Sel.Index, 0}, str)
+		ins.Sel.Index += len(str)
 
 		return nil
 	},

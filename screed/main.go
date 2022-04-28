@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/marekmaskarinec/creed"
+	"github.com/marekmaskarinec/creed/lib"
 )
 
 func help() {

@@ -1,3 +1,3 @@
-module github.com/marekmaskarinec/creed
+module github.com/marekmaskarinec/creed/lib
 
 go 1.18
