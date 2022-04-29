@@ -17,6 +17,9 @@ func lex(command string) []token {
 		case '"':
 			tok.kind = kindString
 			for i++; i < len(runes) && runes[i] != '"'; i++ {
+				if runes[i] == '\\' {
+					i++
+				}
 				tok.value += string(runes[i])
 			}
 

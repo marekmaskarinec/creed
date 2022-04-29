@@ -40,12 +40,15 @@ func (ins *Instance) ExecCommand(command string) error {
 }
 
 func (ins *Instance) subst(sel Sel, value string) {
+	ins.fixSel()
+
 	buf := make([]rune, 0, len(ins.Buf)-sel.Length+len(value))
 	buf = append(buf, ins.Buf[:sel.Index]...)
 	buf = append(buf, []rune(value)...)
 	buf = append(buf, ins.Buf[sel.Index+sel.Length:]...)
 	ins.Buf = buf
 
+	ins.Sel.Length = len(value)
 	ins.UndoBuffer = append(ins.UndoBuffer, Change{sel, value})
 }
 
@@ -54,13 +57,13 @@ func (ins *Instance) fixSel() {
 		ins.Sel.Index = 0
 	}
 
-	if ins.Sel.Index >= len(ins.Buf) {
-		ins.Sel.Index = len(ins.Buf) - 1
+	if ins.Sel.Index > len(ins.Buf) {
+		ins.Sel.Index = len(ins.Buf)
 		ins.Sel.Length = 0
 	}
 
 	if ins.Sel.Index+ins.Sel.Length >= len(ins.Buf) {
-		ins.Sel.Length = len(ins.Buf) - ins.Sel.Index - 1
+		ins.Sel.Length = len(ins.Buf) - ins.Sel.Index
 	}
 
 	if ins.Sel.Length < 0 {
@@ -99,6 +102,8 @@ func (ins *Instance) selectLine() {
 		ins.Sel.Length++
 	}
 	ins.Sel.Length++
+
+	ins.fixSel()
 }
 
 func (ins *Instance) moveLinesDown(n int) {
