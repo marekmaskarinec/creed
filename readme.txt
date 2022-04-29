@@ -96,6 +96,15 @@ over
 roll - todo
 pick - todo
 
+IO:
+
+read ( t -- ) sets the content to the contents of a file. Won't work if the
+              instance is currently not saved. if an unexisting file is passed,
+              CREED won't load anything, but will just set the instance's file
+write ( -- ) writes the content to the last loaded file. if the file doesn't
+             exist, creates it.
+discard ( -- ) sets the saved flag to true, but doesn't save anything
+
 Operators:
 
 neg ( n -- n ) negates a number

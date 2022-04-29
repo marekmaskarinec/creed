@@ -1,8 +1,8 @@
 package creed
 
 import (
-	"io"
 	"fmt"
+	"io"
 	"regexp"
 )
 
@@ -21,6 +21,10 @@ type Instance struct {
 	UndoBuffer []Change
 	// Writer that is written to when CREED needs to print something
 	Writer io.Writer
+
+	Filename string
+	// False if buf content was edited
+	Saved bool
 }
 
 func NewInstance(src string, writer io.Writer) Instance {
@@ -29,8 +33,9 @@ func NewInstance(src string, writer io.Writer) Instance {
 	}
 
 	return Instance{
-		Buf: []rune(src),
+		Buf:    []rune(src),
 		Writer: writer,
+		Saved:  true,
 	}
 }
 
@@ -50,6 +55,7 @@ func (ins *Instance) subst(sel Sel, value string) {
 
 	ins.Sel.Length = len(value)
 	ins.UndoBuffer = append(ins.UndoBuffer, Change{sel, value})
+	ins.Saved = false
 }
 
 func (ins *Instance) fixSel() {
@@ -76,9 +82,9 @@ func (ins *Instance) match(t string) ([]int, error) {
 	if err != nil {
 		return []int{}, fmt.Errorf("regex error: %w", err)
 	}
-	match := regex.FindStringIndex(string(ins.Buf[ins.Sel.Index + ins.Sel.Length:]))
+	match := regex.FindStringIndex(string(ins.Buf[ins.Sel.Index+ins.Sel.Length:]))
 	if len(match) == 0 {
-		match = regex.FindStringIndex(string(ins.Buf[:ins.Sel.Index + ins.Sel.Length]))
+		match = regex.FindStringIndex(string(ins.Buf[:ins.Sel.Index+ins.Sel.Length]))
 	} else {
 		match[0] += ins.Sel.Index + ins.Sel.Length
 		match[1] += ins.Sel.Index + ins.Sel.Length
@@ -92,13 +98,13 @@ func (ins *Instance) match(t string) ([]int, error) {
 }
 
 func (ins *Instance) selectLine() {
-	for ins.Sel.Index > 0 && ins.Buf[ins.Sel.Index - 1] != '\n' {
+	for ins.Sel.Index > 0 && ins.Buf[ins.Sel.Index-1] != '\n' {
 		ins.Sel.Index--
 	}
 
 	ins.Sel.Length = 0
-	for ins.Sel.Index + ins.Sel.Length < len(ins.Buf) &&
-		ins.Buf[ins.Sel.Index + ins.Sel.Length] != '\n' {
+	for ins.Sel.Index+ins.Sel.Length < len(ins.Buf) &&
+		ins.Buf[ins.Sel.Index+ins.Sel.Length] != '\n' {
 		ins.Sel.Length++
 	}
 	ins.Sel.Length++
@@ -108,9 +114,8 @@ func (ins *Instance) selectLine() {
 
 func (ins *Instance) moveLinesDown(n int) {
 	for n > 0 {
-		for ;
-			ins.Sel.Index < len(ins.Buf) && ins.Buf[ins.Sel.Index] != '\n';
-			ins.Sel.Index++ { }
+		for ; ins.Sel.Index < len(ins.Buf) && ins.Buf[ins.Sel.Index] != '\n'; ins.Sel.Index++ {
+		}
 		ins.Sel.Index++
 
 		n--
@@ -121,9 +126,8 @@ func (ins *Instance) moveLinesDown(n int) {
 
 func (ins *Instance) moveLinesUp(n int) {
 	for n > 0 {
-		for ;
-			ins.Sel.Index > 0 && ins.Buf[ins.Sel.Index] != '\n';
-			ins.Sel.Index-- { }
+		for ; ins.Sel.Index > 0 && ins.Buf[ins.Sel.Index] != '\n'; ins.Sel.Index-- {
+		}
 		ins.Sel.Index--
 
 		n--
@@ -133,5 +137,5 @@ func (ins *Instance) moveLinesUp(n int) {
 }
 
 func (ins *Instance) selSlice() []rune {
-	return ins.Buf[ins.Sel.Index:ins.Sel.Index+ins.Sel.Length]
+	return ins.Buf[ins.Sel.Index : ins.Sel.Index+ins.Sel.Length]
 }
