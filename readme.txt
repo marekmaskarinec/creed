@@ -1,86 +1,60 @@
 CREED - concatenative regex-based editor
 
-CREED is a concatenative language for editing text. It heavily relies on regex.
-CREED is implemented as a go library, which can be used inside editors. See
-screed - a program applying a creed command to stdin and then printing the
-result to stdout.
+CREED is a concatenative language for simple text processing scripts.
 
-Language description:
+Language description
+===============================================================================
 
-A CREED instance contains two main things - a sel and a buffer. Buffer is an
-array of UTF32 characters (yes, creed handles unicode). Sel describes an area
-of text in the buffer using a start index and a length. Sel can never be out of
-bounds - commands will move it and trim it so it's always valid. Currently
-CREED uses go's regex, but I will write my own if I ever have time for it.
-There are 3 types in CREED - numbers, "strings" and {groups}. The syntax is
-very similar to other concatenative languages like forth.
+A CREED state contains three things - the mark, the stack and the buffer.
+The mark is a pair of an index and a length both referencing the buffer. The
+buffer is a string. The stack is the stack used by CREED programs.
 
-A CREED instance also has a Writer. The Writer is an io.Writer and is used to
-print debug information.
+Creed supports three base data types. Numbers, "text", symbols and
+{groups}, which are anonymous functions that can also be used as arrays.
 
-Examples:
+You can bind a group to a symbol using bind. Example:
 
-input: heaao
-command: "aa" / "ll" s
-result: hello
+{ dup multiply } "square" bind
 
-input: ababab
-command: # "b" { "c" a } x
-result: abcabcabc
+Upon writing a symbol, apply is used on that symbols content.
 
-input: ababab
-command: 4 +l "b" { "c" a } x
-result: abcabcab
+Builtin funcions
+===============================================================================
 
-input:
-lorem
-ipsum
-dolor
-sit
-amet
-command: "$" , "o" { # d } x
-result:
-ipsum
-sit
-amet
+These are functions included in the core language, however there is a builtin
+library providing many more functions.
 
-Command list:
+notation: ( input -- output)
+	t is text
+	n is a number
+	g is a group
+	r is a regex (still text)
 
-Editing commands:
 
-d          delete text in sel. like "" s
-s ( t -- ) substitute text in sel with t
-a ( t -- ) append text after sel
-p ( t -- ) prepend text before sel
+s ( t -- ) substitute the marked text with t
+a ( t -- ) append text after the marked text
+p ( t -- ) prepend text before the marked text
 
-Sel commands:
+Mark commands:
 
-#  ( -- )   select the whole line
--# ( n -- ) move sel N lines up, select current line
-+# ( n -- ) move sel N lines down, select current line
-%# ( n -- ) select the whole nth line
+%    ( n -- ) set absolute mark position
+%.   ( -- n ) push the mark index to the stack
 
-++ ( n -- ) increment sel position by N characters
--- ( n -- ) decrement sel position by N characters
-%% ( n -- ) set absolute sel position  
+%%   ( n -- ) set absolute mark length
+%%.  ( -- n ) push the mark length to the stack
 
-+l ( n -- ) increment sel length by N characters
--l ( n -- ) decrement sel length by N characters
-%l ( n -- ) set absolute sel length
+%/   ( r -- ) set the mark to the match of r
+%%/  ( r -- ) extend the mark to the end of match of r
 
-+w ( n -- ) move sel N words forward - todo
--w ( n -- ) move sel N words backward - todo
+@%.  ( -- )   pushes the marked content to the stack
 
-/  ( t -- ) set sel to the first (from sel) longest match of regex t
-,  ( t -- ) set sel length to the end of the first longest match of regex t
+Flow control:
 
-Loops and conditionals:
-
-x ( tg -- ) foreach match of t inside sel, run g
-y ( tg -- ) between matches of t run g - todo
-g ( tg -- ) if sel contains t, run g
-v ( tg -- ) if sel doesn't contain t, run g - todo
-j ( ng -- ) if n is not a zero, run g - todo
+apply  ( g -- )   apply g
+@      ( -- )     apply the current group recursively
+branch ( ngg -- ) apply the first g if n is non zero, else apply the second g
+awas   ( g -- )   apply with altered state - applies the group with the marked
+                  text as the buffer, and then substitutes it back
 
 Stack operation:
 
@@ -89,37 +63,49 @@ like in forth.
 dup
 drop
 swap
-nip
 rot
 tuck
 over
-roll - todo
-pick - todo
+roll
+pick
 
 IO:
 
-read ( t -- ) sets the content to the contents of a file. Won't work if the
-              instance is currently not saved. if an unexisting file is passed,
-              CREED won't load anything, but will just set the instance's file
-write ( -- ) writes the content to the last loaded file. if the file doesn't
-             exist, creates it.
+include ( t -- ) includes the symbols defined in a file
+eval    ( t -- ) evaluates t, with the current stack
+
+read    ( t -- ) sets the content to the contents of a file. Won't work if the
+                 instance is currently not saved. if an unexisting file is passed,
+                 CREED won't load anything, but will just set the instance's file
+write   ( -- ) writes the content to the last loaded file. if the file doesn't
+               exist, creates it.
 discard ( -- ) sets the saved flag to true, but doesn't save anything
 
-Operators:
+Math:
 
-neg ( n -- n ) negates a number
+neg      ( n -- n )
+plus     ( nn -- n )
+minus    ( nn -- n )
+divide   ( nn -- n )
+multiply ( nn -- n )
+modulo   ( nn -- n )
+
+Logic:
+
+and
+or
+equal
+lesser
+greater
+
+groups:
+
+append ( gg -- g ) appends groups
+take   ( gn -- g ) pushes a group with the first n elements
+drop   ( gn -- g ) pushes a group with the last n elements
+group  ( an -- g ) groups the first n items on the stack
 
 Misc:
 
-help ( -- ) help - todo
-dump ( -- ) dumps the stack content to Writer
-
-
-CREED lib usage:
-
-To use CREED, you first need to create an instance. Do that using the
-NewInstance function. You need to pass it the starting buffer (which can be
-later changed) and the Writer.
-
-A creed instance then offerst the ExecCommand method, which can be used to run
-commands from a string.
+help ( -- ) help
+dump ( -- ) dumps the stack content
