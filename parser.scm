@@ -1,4 +1,4 @@
-(module (creed lexer) *
+(module (creed parser) *
 	(import
 		scheme
 		srfi-152
@@ -19,7 +19,7 @@
 
 		(define (walk-while input while)
 			(define (do-walk input while)
-				(if (while input)
+				(if (and (not (null? input)) (while input))
 					(cons (car input) (do-walk (cdr input) while))
 
 					(list)))
@@ -94,4 +94,20 @@
 					(convert-value (token-value tok) (token-type tok))
 					(token-type tok)
 					(token-location tok)))
-			tokens)))
+			tokens))
+
+	(define (generate-tree tokens)
+		(define (collect-group group tokens)
+			(if (eq? (token-type (car tokens)) 'group-end)
+				(cons (reverse group) (generate-tree (cdr tokens)))
+				(collect-group (cons (car tokens) group) (cdr tokens))))
+
+		(if (null? tokens)
+			(list)
+
+			(if (eq? (token-type (car tokens)) 'group-begin)
+				(collect-group (list) (cdr tokens))
+				(cons (car tokens) (generate-tree (cdr tokens))))))
+
+	(define (parse text filename)
+		(generate-tree (convert-tokens (lex text (make-location 0 0 filename))))))
