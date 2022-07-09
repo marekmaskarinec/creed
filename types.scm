@@ -7,9 +7,17 @@
 	make-token
 		token-value token-value-set!
 		token-type token-type-set!
-		token-location token-location-set!)
+		token-location token-location-set!
 
-	(import (chicken base) (chicken format))
+	make-state
+		state-buffer state-buffer-set!
+		state-mark state-mark-set!
+		state-stack state-stack-set!
+		state-symbols state-symbols-set!
+
+	make-crerror)
+
+	(import scheme (chicken base) (chicken format))
 
 
 	(define-record location lno cno filename)
@@ -26,4 +34,14 @@
 			(token-type t)
 			(token-location t)))
 
-	(define-record state buffer mark stack symbols))
+	(define-record state buffer mark stack symbols)
+
+	(define-record crerror type location)
+	(define-record-printer (crerror e out)
+		(fprintf out "~s:(~s:~s) ~s"
+			(location-filename (crerror-location e))
+			(location-lno (crerror-location e))
+			(location-cno (crerror-location e))
+			(case (crerror-type e)
+				((unterminated-group) "Unterminated group.")
+				((unexpected-token) "Unexpected token.")))))

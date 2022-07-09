@@ -1,6 +1,7 @@
 (module (creed parser) *
 	(import
 		scheme
+		srfi-12
 		srfi-152
 		(chicken base)
 		(chicken format)
@@ -98,16 +99,36 @@
 
 	(define (generate-tree tokens)
 		(define (collect-group group tokens)
+			;; handle unterminated group
+			(when (null? tokens)
+				(abort (make-crerror
+					'unterminated-group
+					(make-location 0 0 ""))))
+
 			(if (eq? (token-type (car tokens)) 'group-end)
+				;; basecase
 				(cons (reverse group) (generate-tree (cdr tokens)))
+				;; else
 				(collect-group (cons (car tokens) group) (cdr tokens))))
 
 		(if (null? tokens)
+			;; basecase
 			(list)
 
+			;; else
 			(if (eq? (token-type (car tokens)) 'group-begin)
+				;; found group
 				(collect-group (list) (cdr tokens))
-				(cons (car tokens) (generate-tree (cdr tokens))))))
+
+				;; else
+				(if (eq? (token-type (car tokens)) 'group-end)
+					;; handle } without an open group
+					(abort (make-crerror
+						'unexpected-token
+						(token-location (car tokens))))
+
+					;; else
+					(cons (car tokens) (generate-tree (cdr tokens)))))))
 
 	(define (parse text filename)
 		(generate-tree (convert-tokens (lex text (make-location 0 0 filename))))))
