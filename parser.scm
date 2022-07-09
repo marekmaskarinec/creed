@@ -27,59 +27,69 @@
 
 			(list->string (do-walk (string->list input) while)))
 
+		(define (lex-next input char)
+			(case (decide char)
+				((number) (walk-while
+					input
+					(lambda (i)
+						(eq? (decide (car i)) 'number))))
+      
+				((group-begin) (substring input 0 1))
+      
+				((group-end) (substring input 0 1))
+      
+				((string)
+				 	(string-append
+						"\""
+					 	(walk-while
+							(substring input 1)
+							(lambda (i)
+								(not (eq? (decide (car i)) 'string))))
+						"\""))
+      
+				((ident) (walk-while
+					input
+					(lambda (i)
+						(eq? (decide (car i)) 'ident))))))
+
+		(define (handle-whitespaces input char loc)
+			(lex
+				(substring input 1)
+				(make-location
+					(+ (location-lno loc) (if (eq? char #\newline) 1 0))
+					(if (eq? char #\newline) 0 (+ (location-cno loc) 1))
+					(location-filename loc))))
+
+		(define (advance-location loc token)
+			(make-location
+				(location-lno loc)
+				(+
+					(location-cno loc)
+					(string-length (token-value token)))
+				(location-filename loc)))
+
+		(define (advance-buffer input token)
+			(substring
+				input
+				(string-length (token-value token))))
+
 		(if (= (string-length input) 0)
 			(list)
 
 			(let ((char (string-ref input 0)))
 				(if (eq? (decide char) 'whitespace)
-					(lex
-						(substring input 1)
-						(make-location
-							(+ (location-lno loc) (if (eq? char #\newline) 1 0))
-							(if (eq? char #\newline) 0 (+ (location-cno loc) 1))
-							(location-filename loc)))
+					(handle-whitespaces input char loc)
       
 					(let
 						((token
 							(make-token
-								(case (decide char)
-									((number) (walk-while
-										input
-										(lambda (i)
-											(eq? (decide (car i)) 'number))))
-      
-									((group-begin) (substring input 0 1))
-      
-									((group-end) (substring input 0 1))
-      
-									((string)
-									 	(string-append
-											"\""
-										 	(walk-while
-												(substring input 1)
-												(lambda (i)
-													(not (eq? (decide (car i)) 'string))))
-											"\""))
-      
-									((ident) (walk-while
-										input
-										(lambda (i)
-											(eq? (decide (car i)) 'ident)))))
-      
+     						(lex-next input char) 
 								(decide char) loc)))
-      
 						(cons
 							token
 							(lex
-								(substring
-									input
-									(string-length (token-value token)))
-								(make-location
-									(location-lno loc)
-									(+
-										(location-cno loc)
-										(string-length (token-value token)))
-									(location-filename loc)))))))))
+								(advance-buffer input token)
+								(advance-location loc token))))))))
 
 	(define (convert-tokens tokens)
 		(define (convert-value value type)
