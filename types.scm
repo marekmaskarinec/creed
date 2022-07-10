@@ -44,4 +44,5 @@
 			(location-cno (crerror-location e))
 			(case (crerror-type e)
 				((unterminated-group) "Unterminated group.")
-				((unexpected-token) "Unexpected token.")))))
+				((unexpected-token) "Unexpected token.")
+				((undefined-ident) "Undefined identificator.")))))

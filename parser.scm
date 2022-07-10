@@ -2,10 +2,12 @@
 	(import
 		scheme
 		srfi-12
+		srfi-69
 		srfi-152
 		(chicken base)
 		(chicken format)
-		(creed types))
+		(creed types)
+		(creed builtins))
 
 	(define (lex input loc)
 		;; decides the token type based on the first type
@@ -127,8 +129,11 @@
 
 			;; else
 			(if (eq? (token-type (car tokens)) 'group-begin)
-				;; found group
-				(collect-group (list) (cdr tokens))
+				;; found a group
+				(let ((group (collect-group (list) (cdr tokens))))
+					(cons
+						(make-token (car group) 'group (token-location (car tokens)))
+						(cdr group)))
 
 				;; else
 				(if (eq? (token-type (car tokens)) 'group-end)
@@ -140,5 +145,27 @@
 					;; else
 					(cons (car tokens) (generate-tree (cdr tokens)))))))
 
+		(define (link-builtins tokens)
+			(define (is-builtin? token)
+				(and
+					(eq? (token-type token) 'ident)
+					(hash-table-exists? builtins (token-value token))))
+
+			(define (link-builtin token)
+				(make-token
+					(hash-table-ref builtins (token-value token))
+					'builtin
+					(token-location token)))
+
+			(if (null? tokens)
+				(list)
+
+				(cons
+					(if (is-builtin? (car tokens))
+						(link-builtin (car tokens))
+						(car tokens))
+					(link-builtins (cdr tokens)))))
+
+
 	(define (parse text filename)
-		(generate-tree (convert-tokens (lex text (make-location 0 0 filename))))))
+		(link-builtins (generate-tree (convert-tokens (lex text (make-location 0 0 filename)))))))
