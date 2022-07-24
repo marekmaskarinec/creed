@@ -9,19 +9,18 @@
 		(creed types))
 
 	(define (creed-push! state val)
-		(state-stack-set! (cons val (state-stack state))))
+		(state-stack-set! state (cons val (state-stack state))))
 
-
-	(define (apply-ident! state ident)
-		(define (ident-defined? state ident)
-			(hash-table-exists? (state-symbols state) ident))
+	(define (apply-symbol! state symbol)
+		(define (symbol-defined? state symbol)
+			(hash-table-exists? (state-symbols state) symbol))
   
-		(define (state-ident-ref state ident)
-			(hash-table-ref (state-symbols state) ident))
+		(define (state-symbol-ref state symbol)
+			(hash-table-ref (state-symbols state) symbol))
 
-		(if (ident-defined? state ident)
-			(apply! state (state-ident-ref state ident))
-			(abort (make-crerror 'undefined-ident))))
+		(if (symbol-defined? state symbol)
+			(apply! state (state-symbol-ref state symbol))
+			(abort (make-crerror 'undefined-symbol))))
 
 	(define (apply! state tokens)
 		(if (null? tokens)
@@ -30,7 +29,7 @@
 			(begin
 				(case (token-type (car tokens))
 					((number string group) (creed-push! state (token-value (car tokens))))
-					((builtin) ((token-value (car tokens)) state (car tokens)))
-					((ident) (apply-ident! state (car tokens))))
+					((builtin) ((token-value (car tokens)) state (token-location (car tokens))))
+					((symbol) (apply-symbol! state (car tokens))))
 
 				(apply! state (cdr tokens))))))

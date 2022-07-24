@@ -18,7 +18,7 @@
 				((char=? char #\{) 'group-begin)
 				((char=? char #\}) 'group-end)
 				((char=? char #\") 'string)
-				(else 'ident)))
+				(else 'symbol)))
 
 		(define (walk-while input while)
 			(define (do-walk input while)
@@ -49,10 +49,10 @@
 								(not (eq? (decide (car i)) 'string))))
 						"\""))
       
-				((ident) (walk-while
+				((symbol) (walk-while
 					input
 					(lambda (i)
-						(eq? (decide (car i)) 'ident))))))
+						(eq? (decide (car i)) 'symbol))))))
 
 		(define (handle-whitespaces input char loc)
 			(lex
@@ -99,7 +99,7 @@
 				((number) (string->number value))
 				((string) (substring value 1 (- (string-length value) 1)))
 				((group-begin group-end) value)
-				((ident) (string->symbol value))))
+				((symbol) (string->symbol value))))
 
 		(map
 			(lambda (tok)
@@ -148,7 +148,7 @@
 		(define (link-builtins tokens)
 			(define (is-builtin? token)
 				(and
-					(eq? (token-type token) 'ident)
+					(eq? (token-type token) 'symbol)
 					(hash-table-exists? builtins (token-value token))))
 
 			(define (link-builtin token)
