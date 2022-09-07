@@ -1,0 +1,11 @@
+#!/bin/sh
+
+clang -o creed \
+	*.c \
+	-I . \
+	-Wall \
+	-g \
+	-Wno-unused-label \
+	-Wno-pointer-to-int-cast \
+	-lm \
+	-fsanitize=memory \
