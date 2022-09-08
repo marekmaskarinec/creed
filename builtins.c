@@ -142,6 +142,16 @@ struct CrErr PERCENTPERCENTSLASH(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr ATPERCENTDOT(struct CrState *state) {
+	CHECKOUT(crStatePush(state, (struct CrVal){
+		.kind = CrValStr,
+		.str = crStrDup(state->mark)
+	}));
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -155,4 +165,5 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "%%."         , PERCENTPERCENTDOT        );
 	crStateAddBuiltin(state, "%/"          , PERCENTSLASH             );
 	crStateAddBuiltin(state, "%%/"         , PERCENTPERCENTSLASH      );
+	crStateAddBuiltin(state, "@%."         , ATPERCENTDOT             );
 }

@@ -81,7 +81,7 @@ void crValPrint(FILE *f, struct CrVal v) {
 		fprintf(f, "NULL");
 		break;
 	case CrValStr:
-		fprintf(f, "%.*ls", (int)v.str.s, v.str.p);
+		fprintf(f, "%.*ls", (int)v.str.s + 1, v.str.p);
 		break;
 	case CrValNum:
 		fprintf(f, "%d", v.num);

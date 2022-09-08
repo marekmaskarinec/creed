@@ -125,6 +125,7 @@ typedef struct CrErr (*CrBuiltin)(struct CrState *);
 void crFatal(char *msg, ...);
 unsigned crHash(CrSlice(char) s);
 char *crWsToMb(CrSlice(wchar_t) s);
+CrSlice(wchar_t) crStrDup(CrSlice(wchar_t) s);
 
 size_t crUTF8Decode(wchar_t *out, const char *s_);
 CrSlice(wchar_t) crUTF8ToSlice(const char *ip, size_t is);
