@@ -152,6 +152,33 @@ struct CrErr ATPERCENTDOT(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr apply(struct CrState *state) {
+	struct CrVal v;
+	CHECKOUT(crStatePopTyped(state, &v, CrValGroup));
+
+	CHECKOUT(crEval(state, &v.group));
+
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr branch(struct CrState *state) {
+	struct CrVal g2;
+	CHECKOUT(crStatePopTyped(state, &g2, CrValGroup));
+	struct CrVal g1;
+	CHECKOUT(crStatePopTyped(state, &g1, CrValGroup));
+	struct CrVal n;
+	CHECKOUT(crStatePopTyped(state, &n, CrValNum));
+
+	if (n.num)
+		CHECKOUT(crEval(state, &g1.group));
+	else
+		CHECKOUT(crEval(state, &g2.group));
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -166,4 +193,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "%/"          , PERCENTSLASH             );
 	crStateAddBuiltin(state, "%%/"         , PERCENTPERCENTSLASH      );
 	crStateAddBuiltin(state, "@%."         , ATPERCENTDOT             );
+	crStateAddBuiltin(state, "apply"       , apply                    );
+	crStateAddBuiltin(state, "branch"      , branch                   );
 }
