@@ -117,7 +117,9 @@ struct CrState {
 	struct CrVal stackBase[STACK_SIZE];
 	struct CrVal *stack;
 
+	// currently evaluated token/group
 	struct CrTok *tok;
+	struct CrGroup *group;
 };
 
 typedef struct CrErr (*CrBuiltin)(struct CrState *);

@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "");
 
-	char *buf = "0 0 { \"true\" } { \"false\" } dump branch dump";
+	char *buf = "0 { @ } apply";
 
 	struct CrLex lex = {};
 	lex.buf = buf;

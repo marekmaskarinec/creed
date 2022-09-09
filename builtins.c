@@ -179,6 +179,12 @@ struct CrErr branch(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr AT(struct CrState *state) {
+	CHECKOUT(crEval(state, state->group));
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -195,4 +201,5 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "@%."         , ATPERCENTDOT             );
 	crStateAddBuiltin(state, "apply"       , apply                    );
 	crStateAddBuiltin(state, "branch"      , branch                   );
+	crStateAddBuiltin(state, "@"           , AT                       );
 }

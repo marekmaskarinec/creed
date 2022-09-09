@@ -1,6 +1,8 @@
 #include <creed.h>
 
 struct CrErr crEval(struct CrState *state, struct CrGroup *group) {
+	state->group = group;
+
 	for (; group; group = group->next) {
 		state->tok = group->tok;
 
