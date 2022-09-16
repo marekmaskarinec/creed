@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "");
 
-	char *buf = "0 3 dup dump";
+	char *buf = "0 6 4 over dump";
 
 	struct CrLex lex = {};
 	lex.buf = buf;

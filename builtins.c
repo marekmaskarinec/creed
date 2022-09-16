@@ -216,6 +216,63 @@ struct CrErr dup(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr swap(struct CrState *state) {
+	struct CrVal v1;
+	CHECKOUT(crStatePop(state, &v1));
+	struct CrVal v2;
+	CHECKOUT(crStatePop(state, &v2));
+
+	CHECKOUT(crStatePush(state, v2));
+	CHECKOUT(crStatePush(state, v1));
+
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr rot(struct CrState *state) {
+	struct CrVal v1;
+	CHECKOUT(crStatePop(state, &v1));
+	struct CrVal v2;
+	CHECKOUT(crStatePop(state, &v2));
+	struct CrVal v3;
+	CHECKOUT(crStatePop(state, &v3));
+
+	CHECKOUT(crStatePush(state, v2));
+	CHECKOUT(crStatePush(state, v1));
+	CHECKOUT(crStatePush(state, v3));
+
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr tuck(struct CrState *state) {
+	struct CrVal v1;
+	CHECKOUT(crStatePop(state, &v1));
+	struct CrVal v2;
+	CHECKOUT(crStatePop(state, &v2));
+
+	CHECKOUT(crStatePush(state, v1));
+	CHECKOUT(crStatePush(state, v2));
+	CHECKOUT(crStatePush(state, v1));
+
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr over(struct CrState *state) {
+	struct CrVal v1;
+	CHECKOUT(crStatePop(state, &v1));
+	struct CrVal v2;
+	CHECKOUT(crStatePop(state, &v2));
+
+	CHECKOUT(crStatePush(state, v2));
+	CHECKOUT(crStatePush(state, v1));
+	CHECKOUT(crStatePush(state, v2));
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -235,4 +292,8 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "branch"      , branch                   );
 	crStateAddBuiltin(state, "awas"        , awas                     );
 	crStateAddBuiltin(state, "dup"         , dup                      );
+	crStateAddBuiltin(state, "swap"        , swap                     );
+	crStateAddBuiltin(state, "rot"         , rot                      );
+	crStateAddBuiltin(state, "tuck"        , tuck                     );
+	crStateAddBuiltin(state, "over"        , over                     );
 }
