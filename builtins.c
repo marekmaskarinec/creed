@@ -206,6 +206,16 @@ struct CrErr awas(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr dup(struct CrState *state) {
+	struct CrVal v;
+	CHECKOUT(crStatePop(state, &v));
+	CHECKOUT(crStatePush(state, v));
+	CHECKOUT(crStatePush(state, v));
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -224,4 +234,5 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "@"           , AT                       );
 	crStateAddBuiltin(state, "branch"      , branch                   );
 	crStateAddBuiltin(state, "awas"        , awas                     );
+	crStateAddBuiltin(state, "dup"         , dup                      );
 }
