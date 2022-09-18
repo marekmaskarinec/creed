@@ -35,6 +35,7 @@ enum CrErrKind {
 	CrErrStackUnderflow,
 	CrErrTypeError,
 	CrErrRegexCompile,
+	CrErrFileError,
 };
 
 struct CrLoc {

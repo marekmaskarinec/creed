@@ -309,6 +309,39 @@ struct CrErr read(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr write_(struct CrState *state, char *mode) {
+	struct CrVal wpath;
+	CHECKOUT(crStatePopTyped(state, &wpath, CrValStr));
+	char *path = crWsToMb(wpath.str);
+
+	struct CrVal data;
+	CHECKOUT(crStatePop(state, &data));
+
+
+	FILE *f = fopen(path, mode);
+	free(path);
+	ASSERT(f == NULL, CrErrFileError, *state->tok);
+
+	crValPrint(f, data);
+
+	fclose(f);
+
+	return (struct CrErr){0};
+}
+
+static 
+struct CrErr write(struct CrState *state) {
+	CHECKOUT(write_(state, "w"));
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr writea(struct CrState *state) {
+	CHECKOUT(write_(state, "a"));
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -334,5 +367,7 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "over"        , over                     );
 	crStateAddBuiltin(state, "parse"       , parse                    );
 	crStateAddBuiltin(state, "read"        , read                     );
+	crStateAddBuiltin(state, "write"       , write                    );
+	crStateAddBuiltin(state, "writea"      , writea                   );
 }
 

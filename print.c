@@ -32,6 +32,9 @@ void crErrPrint(FILE *f, struct CrErr err) {
 	case CrErrRegexCompile:
 		fprintf(f, "regex compile error.");
 		break;
+	case CrErrFileError:
+		fprintf(f, "file error.");
+		break;
 	defult:
 		fprintf(f, "can't print this error");
 		break;
