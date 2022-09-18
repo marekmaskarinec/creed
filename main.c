@@ -6,19 +6,14 @@
 int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "");
 
-	char *buf = "0 6 4 over dump";
-
-	struct CrLex lex = {};
-	lex.buf = buf;
-	lex.bufsiz = strlen(buf);
-
+	char *buf = "0 \"1\" parse dump apply dump";
 	/*do {
 		crLexNext(&lex);
 		printf("tok: %d %.*s\n", lex.tok.raw.s, lex.tok.raw.s, lex.tok.raw.p);
 	} while (lex.tok.kind != CrTokEOF);*/
 
 	struct CrGroup g;
-	struct CrErr e = crParse(&lex, &g);
+	struct CrErr e = crParseStr(buf, &g);
 	if (e.kind) {
 		crErrPrint(stderr, e);
 		fprintf(stderr, "\n");

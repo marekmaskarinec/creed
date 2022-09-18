@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <creed.h>
 
@@ -81,4 +82,23 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 
 struct CrErr crParse(struct CrLex *lex, struct CrGroup *out) {
 	return parse(lex, out, 0);
+}
+
+struct CrErr crParseStr(char *str, struct CrGroup *out) {
+	struct CrLex lex = {0};
+	lex.buf = str;
+	lex.bufsiz = strlen(str);
+
+	CHECKOUT(crParse(&lex, out));
+
+	return (struct CrErr){0};
+}
+
+struct CrErr crParseFile(const char *path, struct CrGroup *out) {
+	char *buf = crReadAll(path);
+
+	CHECKOUT(crParseStr(buf, out));
+	free(buf);
+
+	return (struct CrErr){0};
 }

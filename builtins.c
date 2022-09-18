@@ -273,6 +273,23 @@ struct CrErr over(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr parse(struct CrState *state) {
+	struct CrVal v;
+	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
+
+	char *s = crWsToMb(v.str);
+
+	struct CrGroup g;
+	CHECKOUT(crParseStr(s, &g));
+
+	CHECKOUT(crStatePush(state, (struct CrVal){ .group = g, .kind = CrValGroup }));
+
+	free(s);
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -296,4 +313,5 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "rot"         , rot                      );
 	crStateAddBuiltin(state, "tuck"        , tuck                     );
 	crStateAddBuiltin(state, "over"        , over                     );
+	crStateAddBuiltin(state, "parse"       , parse                    );
 }

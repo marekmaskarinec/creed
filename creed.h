@@ -128,11 +128,14 @@ void crFatal(char *msg, ...);
 unsigned crHash(CrSlice(char) s);
 char *crWsToMb(CrSlice(wchar_t) s);
 CrSlice(wchar_t) crStrDup(CrSlice(wchar_t) s);
+char *crReadAll(const char *path);
 
 size_t crUTF8Decode(wchar_t *out, const char *s_);
 CrSlice(wchar_t) crUTF8ToSlice(const char *ip, size_t is);
 
 struct CrErr crParse(struct CrLex *lex, struct CrGroup *out);
+struct CrErr crParseStr(char *str, struct CrGroup *out);
+struct CrErr crParseFile(const char *path, struct CrGroup *out);
 
 struct CrErr crLexNext(struct CrLex *lex);
 

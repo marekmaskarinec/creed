@@ -71,15 +71,10 @@ pick
 
 IO:
 
-include ( t -- ) includes the symbols defined in a file
-eval    ( t -- ) evaluates t, with the current stack
+parse   ( t -- g ) parses a string into a group
 
-read    ( t -- ) sets the content to the contents of a file. Won't work if the
-                 instance is currently not saved. if an unexisting file is passed,
-                 CREED won't load anything, but will just set the instance's file
-write   ( -- ) writes the content to the last loaded file. if the file doesn't
-               exist, creates it.
-discard ( -- ) sets the saved flag to true, but doesn't save anything
+read    ( t -- )   reads contents of a file onto the stack
+write   ( tt -- )  writes text from the stack to a file
 
 Math:
 
