@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "");
 
-	char *buf = "0 \"1\" parse dump apply dump";
+	char *buf = "0 \"readme.txt\" read dump";
 	/*do {
 		crLexNext(&lex);
 		printf("tok: %d %.*s\n", lex.tok.raw.s, lex.tok.raw.s, lex.tok.raw.p);

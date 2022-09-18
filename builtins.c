@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <creed.h>
 
@@ -290,6 +291,24 @@ struct CrErr parse(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr read(struct CrState *state) {
+	struct CrVal v;
+	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
+	char *s = crWsToMb(v.str);
+
+	char *f = crReadAll(s);
+	free(s);
+
+	CHECKOUT(crStatePush(state, (struct CrVal){
+		.str = crUTF8ToSlice(f, strlen(f)),
+		.kind = CrValStr }));
+
+	free(f);
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -314,4 +333,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "tuck"        , tuck                     );
 	crStateAddBuiltin(state, "over"        , over                     );
 	crStateAddBuiltin(state, "parse"       , parse                    );
+	crStateAddBuiltin(state, "read"        , read                     );
 }
+

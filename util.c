@@ -46,11 +46,12 @@ CrSlice(wchar_t) crStrDup(CrSlice(wchar_t) s) {
 char *crReadAll(const char *path) {
 	FILE *f = fopen(path, "r");
 
-	fseek(f, SEEK_END, 0);
+	fseek(f, 0, SEEK_END);
 	size_t s = ftell(f);
-	fseek(f, SEEK_SET, 0);
+	fseek(f, 0, SEEK_SET);
 
 	char *buf = malloc((s + 1) * sizeof(char));
+	buf[s] = 0;
 	fread(buf, sizeof(char), s, f);	
 
 	return buf;
