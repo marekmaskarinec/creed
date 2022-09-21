@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -76,7 +77,7 @@ struct CrErr PERCENT(struct CrState *state) {
 	struct CrVal v;
 	CHECKOUT(crStatePopTyped(state, &v, CrValNum));
 
-	state->mark.p = state->buf.p + v.num;
+	state->mark.p = state->buf.p + (size_t)v.num;
 
 	state->mark = crStateFixMark(state, state->mark);
 	return (struct CrErr){0};
@@ -342,6 +343,70 @@ struct CrErr writea(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr neg(struct CrState *state) {
+	struct CrVal n;
+	CHECKOUT(crStatePopTyped(state, &n, CrValNum));
+	n.num *= -1;
+
+	CHECKOUT(crStatePush(state, n));
+
+	return (struct CrErr){0};
+}
+
+#define ARITHMETIC(name, operator) \
+static                                            \
+struct CrErr name(struct CrState *state) {        \
+	struct CrVal a, b;                              \
+	CHECKOUT(crStatePopTyped(state, &b, CrValNum)); \
+	CHECKOUT(crStatePopTyped(state, &a, CrValNum)); \
+                                                  \
+	a.num = a.num operator b.num;                   \
+                                                  \
+	CHECKOUT(crStatePush(state, a));                \
+                                                  \
+	return (struct CrErr){0};                       \
+}
+
+ARITHMETIC(plus, +);
+ARITHMETIC(minus, -);
+ARITHMETIC(multiply, *);
+ARITHMETIC(and, &&);
+ARITHMETIC(or, ||);
+ARITHMETIC(equal, ==);
+ARITHMETIC(lesser, <);
+ARITHMETIC(greater, >);
+
+static
+struct CrErr divide(struct CrState *state) {
+	struct CrVal a, b;
+	CHECKOUT(crStatePopTyped(state, &b, CrValNum));
+	CHECKOUT(crStatePopTyped(state, &a, CrValNum));
+
+	ASSERT(b.num == 0, CrErrMathError, *state->tok);
+
+	a.num = a.num / b.num;
+
+	CHECKOUT(crStatePush(state, a));
+
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr modulo(struct CrState *state) {
+	struct CrVal a, b;
+	CHECKOUT(crStatePopTyped(state, &b, CrValNum));
+	CHECKOUT(crStatePopTyped(state, &a, CrValNum));
+
+	ASSERT(b.num == 0, CrErrMathError, *state->tok);
+
+	a.num = fmod(a.num, b.num);
+
+	CHECKOUT(crStatePush(state, a));
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
@@ -369,5 +434,16 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "read"        , read                     );
 	crStateAddBuiltin(state, "write"       , write                    );
 	crStateAddBuiltin(state, "writea"      , writea                   );
+	crStateAddBuiltin(state, "neg"         , neg                      );
+	crStateAddBuiltin(state, "plus"        , plus                     );
+	crStateAddBuiltin(state, "minus"       , minus                    );
+	crStateAddBuiltin(state, "divide"      , divide                   );
+	crStateAddBuiltin(state, "multiply"    , multiply                 );
+	crStateAddBuiltin(state, "modulo"      , modulo                   );
+	crStateAddBuiltin(state, "and"         , and                      );
+	crStateAddBuiltin(state, "or"          , or                       );
+	crStateAddBuiltin(state, "equal"       , equal                    );
+	crStateAddBuiltin(state, "lesser"      , lesser                   );
+	crStateAddBuiltin(state, "greater"     , greater                  );
 }
 

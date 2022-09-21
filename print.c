@@ -35,6 +35,9 @@ void crErrPrint(FILE *f, struct CrErr err) {
 	case CrErrFileError:
 		fprintf(f, "file error.");
 		break;
+	case CrErrMathError:
+		fprintf(f, "math error.");
+		break;
 	defult:
 		fprintf(f, "can't print this error");
 		break;
@@ -87,7 +90,7 @@ void crValPrint(FILE *f, struct CrVal v) {
 		fprintf(f, "%.*ls", (int)v.str.s + 1, v.str.p);
 		break;
 	case CrValNum:
-		fprintf(f, "%d", v.num);
+		fprintf(f, "%g", v.num);
 		break;
 	case CrValSym:
 		fprintf(f, "%.*s", (int)v.sym.d.s + 1, v.sym.d.p);

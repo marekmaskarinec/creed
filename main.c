@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "");
 
-	char *buf = "0 \"hello world\" \"test.txt\" write";
+	char *buf = "0 1 2 plus 2 divide dump";
 	/*do {
 		crLexNext(&lex);
 		printf("tok: %d %.*s\n", lex.tok.raw.s, lex.tok.raw.s, lex.tok.raw.p);

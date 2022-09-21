@@ -36,6 +36,7 @@ enum CrErrKind {
 	CrErrTypeError,
 	CrErrRegexCompile,
 	CrErrFileError,
+	CrErrMathError,
 };
 
 struct CrLoc {
@@ -101,7 +102,7 @@ enum CrValKind {
 struct CrVal {
 	union {
 		CrSlice(wchar_t) str;
-		int num;
+		float num;
 		struct CrGroup group;
 		struct CrSym sym;
 	};
