@@ -8,4 +8,4 @@ clang -o creed \
 	-Wno-unused-label \
 	-Wno-pointer-to-int-cast \
 	-lm \
-	-fsanitize=memory \
+	-fsanitize=address \

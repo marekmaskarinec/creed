@@ -15,12 +15,12 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 	while (lex->tok.kind != CrTokEOF) {
 		struct CrTok *tok = NULL;
 		if (lex->tok.kind != CrTokGroupEnd) {
-			group->tok = malloc(sizeof(struct CrTok));
+			group->tok = calloc(sizeof(struct CrTok), 1);
 			*group->tok = lex->tok;
 			tok = group->tok;
       
 			prev = group;
-			group = group->next = malloc(sizeof(struct CrGroup));
+			group = group->next = calloc(sizeof(struct CrGroup), 1);
 		}
 
 		switch (lex->tok.kind) {
@@ -58,13 +58,15 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 			tok->num = tok->raw.p[0] == '-' ? -n : n;
 			break;
 
-		} case CrTokSymbol:
-			tok->sym.d = tok->raw;
+		} case CrTokSymbol: {
+			CrSlice(char) sl = tok->raw;
+			sl.p = crDupMem(tok->raw.p, sl.s);
+			tok->sym.d = sl;
 			tok->sym.h = crHash(tok->sym.d);
 
 			break;
 
-		default:
+		} default:
 			break;
 		}
 
@@ -72,7 +74,7 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 	}
 
 	if (prev && prev->next) {
-		free(prev->next);
+		free(group);
 		prev->next = NULL;
 	}
 

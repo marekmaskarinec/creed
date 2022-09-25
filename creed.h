@@ -169,4 +169,20 @@ void crHashMapSet(struct CrHashMap *hm, uint32_t hash, void *ptr);
 void *crHashMapGetStr(struct CrHashMap *hm, char *str);
 void crHashMapSetStr(struct CrHashMap *hm, char *str, void *ptr);
 
+void crFreeHashMap(struct CrHashMap *h);
+void crFreeSym(struct CrSym *s);
+void crFreeGroup(struct CrGroup *g);
+void crFreeTok(struct CrTok *t);
+void crFreeLex(struct CrLex *lex);
+void crFreeVal(struct CrVal *v);
+void crFreeState(struct CrState *s);
+
+void *crDupMem(void *p, size_t s);
+struct CrHashMap *crDupHashMap(struct CrHashMap *t, struct CrHashMap *h);
+struct CrSym *crDupSym(struct CrSym *t, struct CrSym *s);
+struct CrGroup *crDupGroup(struct CrGroup *t, struct CrGroup *g);
+struct CrTok *crDupTok(struct CrTok *tgt, struct CrTok *t);
+struct CrLex *crDupLex(struct CrLex *t, struct CrLex *lex);
+struct CrVal *crDupVal(struct CrVal *t, struct CrVal *v);
+
 #endif

@@ -18,13 +18,16 @@ int main(int argc, char *argv[]) {
 		crErrPrint(stderr, e);
 		fprintf(stderr, "\n");
 	}
+
 	crGroupPrint(stderr, g);
 
 	struct CrState s;
 	crStateInit(&s);
 	crStateSetBuf(&s, "aůbbccddeeff");
+
 	fprintf(stderr, "input string(%zu): %ls\n", s.buf.s, s.buf.p);
 	fprintf(stderr, "executing: %s\n", buf);
+
 	e = crEval(&s, &g);
 	if (e.kind) {
 		crErrPrint(stderr, e);
@@ -32,5 +35,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	fprintf(stderr, "buf: %.*ls\n", (int)s.buf.s + 1, s.buf.p);
+
+	crFreeState(&s);
+	crFreeGroup(&g);
+
 	return 0;
 }

@@ -19,6 +19,8 @@ void grow(struct CrHashMap *hm) {
 			a[hm->cells[i].hash % newSize] = hm->cells[i];
 
 	hm->size = newSize;
+
+	free(hm->cells);
 	hm->cells = a;
 }
 

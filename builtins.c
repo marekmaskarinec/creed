@@ -407,6 +407,15 @@ struct CrErr modulo(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr bind(struct CrState *state) {
+	struct CrVal t, g;
+	CHECKOUT(crStatePopTyped(state, &t, CrValStr));
+	CHECKOUT(crStatePopTyped(state, &g, CrValGroup));
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
