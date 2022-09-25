@@ -29,6 +29,8 @@ static
 struct CrErr drop(struct CrState *state) {
 	struct CrVal val;
 	CHECKOUT(crStatePop(state, &val));
+	
+	crFreeVal(&val);
 	return (struct CrErr){0};
 }
 
@@ -39,6 +41,8 @@ struct CrErr s(struct CrState *state) {
 
 	crStateSubst(state, state->mark, v.str);
 	state->mark = crStateFixMark(state, state->mark);
+
+	crFreeVal(&v);
 	return (struct CrErr){0};
 }
 
@@ -54,6 +58,8 @@ struct CrErr a(struct CrState *state) {
 		},
 		v.str);
 	state->mark = crStateFixMark(state, state->mark);
+
+	crFreeVal(&v);
 	return (struct CrErr){0};
 }
 
@@ -69,6 +75,8 @@ struct CrErr p(struct CrState *state) {
 		},
 		v.str);
 	state->mark = crStateFixMark(state, state->mark);
+
+	crFreeVal(&v);
 	return (struct CrErr){0};
 }
 
@@ -123,6 +131,7 @@ struct CrErr PERCENTSLASH(struct CrState *state) {
 	CHECKOUT(crStateMatch(state, &m, v.str));
 	state->mark = m;
 
+	crFreeVal(&v);
 	return (struct CrErr){0};
 }
 
@@ -141,6 +150,7 @@ struct CrErr PERCENTPERCENTSLASH(struct CrState *state) {
 		state->mark.p = m.p;
 	}
 
+	crFreeVal(&v);
 	return (struct CrErr){0};
 }
 
@@ -178,6 +188,8 @@ struct CrErr branch(struct CrState *state) {
 	else
 		CHECKOUT(crEval(state, &g2.group));
 
+	crFreeVal(&g1);
+	crFreeVal(&g2);
 	return (struct CrErr){0};
 }
 
@@ -205,15 +217,18 @@ struct CrErr awas(struct CrState *state) {
 
 	free(ret.p);
 
+	crFreeVal(&g);
 	return (struct CrErr){0};
 }
 
 static
 struct CrErr dup(struct CrState *state) {
-	struct CrVal v;
+	struct CrVal v, d;
 	CHECKOUT(crStatePop(state, &v));
+	crDupVal(&d, &v);
+
 	CHECKOUT(crStatePush(state, v));
-	CHECKOUT(crStatePush(state, v));
+	CHECKOUT(crStatePush(state, d));
 
 	return (struct CrErr){0};
 }
@@ -249,12 +264,14 @@ struct CrErr rot(struct CrState *state) {
 
 static
 struct CrErr tuck(struct CrState *state) {
-	struct CrVal v1;
+	struct CrVal v1, v1d;
 	CHECKOUT(crStatePop(state, &v1));
+	crDupVal(&v1d, &v1);
+	
 	struct CrVal v2;
 	CHECKOUT(crStatePop(state, &v2));
 
-	CHECKOUT(crStatePush(state, v1));
+	CHECKOUT(crStatePush(state, v1d));
 	CHECKOUT(crStatePush(state, v2));
 	CHECKOUT(crStatePush(state, v1));
 
@@ -265,12 +282,13 @@ static
 struct CrErr over(struct CrState *state) {
 	struct CrVal v1;
 	CHECKOUT(crStatePop(state, &v1));
-	struct CrVal v2;
+	struct CrVal v2, v2d;
 	CHECKOUT(crStatePop(state, &v2));
+	crDupVal(&v2d, &v2);
 
 	CHECKOUT(crStatePush(state, v2));
 	CHECKOUT(crStatePush(state, v1));
-	CHECKOUT(crStatePush(state, v2));
+	CHECKOUT(crStatePush(state, v2d));
 
 	return (struct CrErr){0};
 }
@@ -288,6 +306,7 @@ struct CrErr parse(struct CrState *state) {
 	CHECKOUT(crStatePush(state, (struct CrVal){ .group = g, .kind = CrValGroup }));
 
 	free(s);
+	crFreeVal(&v);
 
 	return (struct CrErr){0};
 }
@@ -306,6 +325,7 @@ struct CrErr read(struct CrState *state) {
 		.kind = CrValStr }));
 
 	free(f);
+	crFreeVal(&v);
 
 	return (struct CrErr){0};
 }
@@ -328,6 +348,7 @@ struct CrErr write_(struct CrState *state, char *mode) {
 
 	fclose(f);
 
+	crFreeVal(&wpath);
 	return (struct CrErr){0};
 }
 

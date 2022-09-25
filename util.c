@@ -32,7 +32,7 @@ char *crWsToMb(CrSlice(wchar_t) s) {
 }
 
 CrSlice(wchar_t) crStrDup(CrSlice(wchar_t) s) {
-	wchar_t *b = malloc(s.s * sizeof(wchar_t));
+	wchar_t *b = malloc((s.s + 1) * sizeof(wchar_t));
 	b[s.s] = 0;
 
 	memcpy(b, s.p, s.s * sizeof(wchar_t));

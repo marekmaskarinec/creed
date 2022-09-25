@@ -30,12 +30,12 @@ struct CrErr crStatePushTok(struct CrState *state, struct CrTok *tok) {
 	switch (tok->kind) {
 	case CrTokGroupBegin:
 		state->stack->kind = CrValGroup;
-		state->stack->group = tok->group;
+		crDupGroup(&state->stack->group, &tok->group);
 		break;
 
 	case CrTokString:
 		state->stack->kind = CrValStr;
-		state->stack->str = tok->str;
+		state->stack->str = crStrDup(tok->str);
 		break;
 
 	case CrTokNumber:
