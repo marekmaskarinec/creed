@@ -7,6 +7,7 @@ struct CrErr crEval(struct CrState *state, struct CrGroup *group) {
 		state->tok = group->tok;
 
 		switch (group->tok->kind) {
+		case CrTokQuote:
 		case CrTokGroupBegin:
 		case CrTokString:
 		case CrTokNumber:

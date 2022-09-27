@@ -58,7 +58,7 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 			tok->num = tok->raw.p[0] == '-' ? -n : n;
 			break;
 
-		} case CrTokSymbol: {
+		} case CrTokQuote: case CrTokSymbol: {
 			CrSlice(char) sl = tok->raw;
 			sl.p = crDupMem(tok->raw.p, sl.s);
 			tok->sym.d = sl;

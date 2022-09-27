@@ -3,9 +3,16 @@
 
 #include <creed.h>
 
+static
+void symsHmFreeFn(struct CrHashMap *self, struct CrHashMapCell *c) {
+	crFreeGroup(c->p);
+	free(c->p);
+}
+
 void crStateInit(struct CrState *state) {
 	crHashMapInit(&state->builtins);
 	crHashMapInit(&state->syms);
+	state->syms.freeFn = symsHmFreeFn;
 
 	state->stack = state->stackBase - 1;
 
@@ -41,6 +48,11 @@ struct CrErr crStatePushTok(struct CrState *state, struct CrTok *tok) {
 	case CrTokNumber:
 		state->stack->kind = CrValNum;
 		state->stack->num = tok->num;
+		break;
+
+	case CrTokQuote:
+		state->stack->kind = CrValSym;
+		crDupSym(&state->stack->sym, &tok->sym);
 		break;
 
 	default:

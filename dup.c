@@ -18,6 +18,7 @@ struct CrHashMap *crDupHashMap(struct CrHashMap *t, struct CrHashMap *h) {
 }
 
 struct CrSym *crDupSym(struct CrSym *t, struct CrSym *s) {
+	t->h = s->h;
 	t->d.p = crDupMem(s->d.p, s->d.s * sizeof(char));
 	t->d.s = s->d.s;
 	return t;
@@ -26,7 +27,7 @@ struct CrSym *crDupSym(struct CrSym *t, struct CrSym *s) {
 struct CrGroup *crDupGroup(struct CrGroup *t, struct CrGroup *g) {
 	*t = *g;
 
-	crDupTok(t->tok, g->tok);
+	t->tok = crDupTok(malloc(sizeof(struct CrTok)), g->tok);
 	if (g->next)
 		t->next = crDupGroup(DUP(g->next), g->next);
 
@@ -43,6 +44,7 @@ struct CrTok *crDupTok(struct CrTok *tgt, struct CrTok *t) {
 	case CrTokGroupBegin:
 		crDupGroup(&tgt->group, &t->group);
 		break;
+	case CrTokQuote:
 	case CrTokSymbol:
 		crDupSym(&tgt->sym, &t->sym);
 		break;

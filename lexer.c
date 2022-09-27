@@ -78,6 +78,14 @@ struct CrErr crLexNext(struct CrLex *lex) {
 
 		nextc(lex);
 		break;
+	case '\'':
+		++lex->tok.raw.p;
+		nextc(lex);
+
+		lex->tok.raw.s = eat(lex, symbolp);
+		lex->tok.kind = CrTokQuote;
+
+		break;
 	default:
 		if (isdigit(peekc(lex)) || peekc(lex) == '-') {
 			lex->tok.raw.s = eat(lex, numberp);

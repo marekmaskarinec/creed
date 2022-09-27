@@ -5,7 +5,8 @@ void crLocPrint(FILE *f, struct CrLoc loc) {
 }
 
 void crErrPrint(FILE *f, struct CrErr err) {
-	crLocPrint(f, err.tok.loc);
+	crTokPrint(f, err.tok);
+	fprintf(f, ": ");
 
 	switch (err.kind) {
 	case CrErrNull:
@@ -45,7 +46,7 @@ void crErrPrint(FILE *f, struct CrErr err) {
 }
 
 void crSymPrint(FILE *f, struct CrSym sym) {
-	fprintf(f, ",sym(%.*s, %d)", (int)sym.d.s, sym.d.p, sym.h);
+	fprintf(f, ",sym(%.*s, 0x%x)", (int)sym.d.s, sym.d.p, sym.h);
 }
 
 void crTokPrint(FILE *f, struct CrTok tok) {
@@ -73,6 +74,7 @@ void crTokPrint(FILE *f, struct CrTok tok) {
 	case CrTokNumber:
 		fprintf(f, "%d", tok.num);
 		break;
+	case CrTokQuote:
 	case CrTokSymbol:
 		crSymPrint(f, tok.sym);
 		break;
@@ -93,7 +95,7 @@ void crValPrint(FILE *f, struct CrVal v) {
 		fprintf(f, "%g", v.num);
 		break;
 	case CrValSym:
-		fprintf(f, "%.*s", (int)v.sym.d.s + 1, v.sym.d.p);
+		crSymPrint(f, v.sym);
 		break;
 	case CrValGroup:
 		fprintf(f, ",group");

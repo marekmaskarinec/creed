@@ -24,6 +24,7 @@ struct CrHashMapCell {
 struct CrHashMap {
 	struct CrHashMapCell *cells;
 	size_t size;
+	void (*freeFn)(struct CrHashMap *, struct CrHashMapCell *);
 };
 
 enum CrErrKind {
@@ -52,7 +53,8 @@ enum CrTokKind {
 	CrTokGroupEnd,
 	CrTokString,
 	CrTokNumber,
-	CrTokSymbol
+	CrTokSymbol,
+	CrTokQuote,
 };
 
 struct CrSym {

@@ -1,6 +1,10 @@
 #include <creed.h>
 
 void crFreeHashMap(struct CrHashMap *h) {
+	if (h->freeFn)
+		for (int i=0; i < h->size; ++i)
+			if (h->cells[i].p)
+				h->freeFn(h, &h->cells[i]);
 	free(h->cells);
 }
 
@@ -25,6 +29,7 @@ void crFreeTok(struct CrTok *t) {
 	case CrTokGroupBegin:
 		crFreeGroup(&t->group);
 		break;
+	case CrTokQuote:
 	case CrTokSymbol:
 		crFreeSym(&t->sym);
 		break;

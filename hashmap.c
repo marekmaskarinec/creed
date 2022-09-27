@@ -7,6 +7,7 @@
 void crHashMapInit(struct CrHashMap *hm) {
 	hm->cells = calloc(sizeof(struct CrHashMapCell), INIT_SIZ);
 	hm->size = INIT_SIZ;
+	hm->freeFn = NULL;
 }
 
 static

@@ -430,9 +430,16 @@ struct CrErr modulo(struct CrState *state) {
 
 static
 struct CrErr bind(struct CrState *state) {
-	struct CrVal t, g;
-	CHECKOUT(crStatePopTyped(state, &t, CrValStr));
+	struct CrVal s, g;
+	CHECKOUT(crStatePopTyped(state, &s, CrValSym));
 	CHECKOUT(crStatePopTyped(state, &g, CrValGroup));
+
+	crHashMapSet(&state->syms,
+		s.sym.h,
+		crDupGroup(malloc(sizeof(struct CrGroup)), &g.group));
+
+	crFreeVal(&s);
+	crFreeVal(&g);
 
 	return (struct CrErr){0};
 }
@@ -475,5 +482,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "equal"       , equal                    );
 	crStateAddBuiltin(state, "lesser"      , lesser                   );
 	crStateAddBuiltin(state, "greater"     , greater                  );
+	crStateAddBuiltin(state, "bind"        , bind                     );
 }
 
