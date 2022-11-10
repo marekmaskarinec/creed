@@ -27,14 +27,17 @@ struct CrSym *crDupSym(struct CrSym *t, struct CrSym *s) {
 struct CrGroup *crDupGroup(struct CrGroup *t, struct CrGroup *g) {
 	*t = *g;
 
-	t->tok = crDupTok(malloc(sizeof(struct CrTok)), g->tok);
-	if (g->next)
-		t->next = crDupGroup(DUP(g->next), g->next);
+	t->toks = calloc(sizeof(struct CrTok *), t->len);
+	for (int i=0; i < t->len; ++i) {
+		t->toks[i] = calloc(sizeof(struct CrTok), 1);
+		crDupTok(t->toks[i], g->toks[i]);
+	}
 
 	return t;
 }
 
 struct CrTok *crDupTok(struct CrTok *tgt, struct CrTok *t) {
+	printf("%p <- %p\n", tgt, t);
 	*tgt = *t;
 
 	switch (t->kind) {

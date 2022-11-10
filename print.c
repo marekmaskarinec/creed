@@ -104,8 +104,9 @@ void crValPrint(FILE *f, struct CrVal v) {
 }
 
 void crGroupPrint(FILE *f, struct CrGroup group) {
-	crTokPrint(f, *group.tok);
-	fprintf(f, "\n");
-
-	if (group.next) crGroupPrint(f, *group.next);
+	fprintf(f, "{ ");
+	for (int i=0; i < group.len; ++i) {
+		crTokPrint(f, *group.toks[i]);
+		fprintf(f, i >= group.len - 1 ? " }" : ", ");
+	}
 }

@@ -13,10 +13,19 @@ void crFreeSym(struct CrSym *s) {
 }
 
 void crFreeGroup(struct CrGroup *g) {
+	for (int i=0; i < g->len; ++i) {
+		crFreeTok(g->toks[i]);
+		free(g->toks[i]);
+	}
+
+	free(g->toks);
+}
+
+void crFreeParGroup(struct CrParGroup *g) {
 	crFreeTok(g->tok);
 	free(g->tok);
 	if (g->next) {
-		crFreeGroup(g->next);
+		crFreeParGroup(g->next);
 		free(g->next);
 	}
 }

@@ -7,9 +7,27 @@
 #define MAX_NEST 256
 
 static
+void pgToG(struct CrGroup *g, struct CrParGroup *pg) {
+	g->len = 0;
+	for (struct CrParGroup *c = pg; c; c = c->next)
+		++g->len;
+
+	g->toks = calloc(sizeof(struct CrGroup *), g->len);
+
+	int i = 0;
+	for (struct CrParGroup *c = pg; c; c = c->next) {
+		g->toks[i] = calloc(sizeof(struct CrTok), 1);
+		crDupTok(g->toks[i], c->tok);
+
+		++i;
+	}
+}
+
+static
 struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
-	struct CrGroup *group = out;
-	struct CrGroup *prev = NULL;
+	struct CrParGroup pgOut = {0};
+	struct CrParGroup *group = &pgOut;
+	struct CrParGroup *prev = NULL;
 
 	crLexNext(lex);
 	while (lex->tok.kind != CrTokEOF) {
@@ -24,11 +42,11 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 		}
 
 		switch (lex->tok.kind) {
-		case CrTokGroupBegin: 
+		case CrTokGroupBegin: {
 			CHECKOUT(parse(lex, &tok->group, level + 1));
 			break;
 
-		case CrTokGroupEnd:
+		} case CrTokGroupEnd: {
 			if (prev && prev->next) {
 				free(prev->next);
 				prev->next = NULL;
@@ -37,7 +55,7 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 			ASSERT(level == 0, CrErrUnexpectedToken, *tok);
 			return (struct CrErr){ .kind = CrErrNull };
 		
-		case CrTokString: {
+		} case CrTokString: {
 			tok->str = crUTF8ToSlice(tok->raw.p, (size_t)tok->raw.s);
 
 			break;
@@ -77,6 +95,9 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 		free(group);
 		prev->next = NULL;
 	}
+
+	pgToG(out, &pgOut);
+	crFreeParGroup(&pgOut);
 
 	ASSERT(level > 0, CrErrUnterminatedGroup, lex->tok);
 	return (struct CrErr){ .kind = CrErrNull };

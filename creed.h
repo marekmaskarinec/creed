@@ -64,9 +64,14 @@ struct CrSym {
 
 struct CrTok;
 
-struct CrGroup {
+struct CrParGroup {
 	struct CrTok *tok;
-	struct CrGroup *next;
+	struct CrParGroup *next;
+};
+
+struct CrGroup {
+	struct CrTok **toks;
+	int len;
 };
 
 struct CrTok {
@@ -174,6 +179,7 @@ void crHashMapSetStr(struct CrHashMap *hm, char *str, void *ptr);
 void crFreeHashMap(struct CrHashMap *h);
 void crFreeSym(struct CrSym *s);
 void crFreeGroup(struct CrGroup *g);
+void crFreeParGroup(struct CrParGroup *g);
 void crFreeTok(struct CrTok *t);
 void crFreeLex(struct CrLex *lex);
 void crFreeVal(struct CrVal *v);
