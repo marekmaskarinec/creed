@@ -62,14 +62,14 @@ notation: `( input -- output )`
 
 like in forth.
 
-`dup`
-`drop`
-`swap`
-`rot`
-`tuck`
-`over`
-`roll`
-`pick`
+* `dup`
+* `drop`
+* `swap`
+* `rot`
+* `tuck`
+* `over`
+* `roll`
+* `pick`
 
 ### IO:
 
@@ -81,20 +81,20 @@ like in forth.
 
 ### Math:
 
-`neg      ( n -- n )`
-`plus     ( nn -- n )`
-`minus    ( nn -- n )`
-`divide   ( nn -- n )`
-`multiply ( nn -- n )`
-`modulo   ( nn -- n )`
+* `neg      ( n -- n )`
+* `plus     ( nn -- n )`
+* `minus    ( nn -- n )`
+* `divide   ( nn -- n )`
+* `multiply ( nn -- n )`
+* `modulo   ( nn -- n )`
 
 ### Logic:
 
-`and`
-`or`
-`equal`
-`lesser`
-`greater`
+* `and`
+* `or`
+* `equal`
+* `lesser`
+* `greater`
 
 ### groups:
 
