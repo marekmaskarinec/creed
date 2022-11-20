@@ -194,6 +194,32 @@ struct CrErr branch(struct CrState *state) {
 }
 
 static
+struct CrErr while_(struct CrState *state) {
+	struct CrVal g2;
+	CHECKOUT(crStatePopTyped(state, &g2, CrValGroup));
+	struct CrVal g1;
+	CHECKOUT(crStatePopTyped(state, &g1, CrValGroup));
+
+	do {
+		CHECKOUT(crEval(state, &g1.group));
+	
+		struct CrVal v;
+		CHECKOUT(crStatePopTyped(state, &v, CrValNum));
+		// NOTE(~mrms): we don't need to free v, since it's always going to be a
+		// number.
+		if (v.num == 0)
+			break;
+
+		CHECKOUT(crEval(state, &g2.group));
+	} while (1);
+
+	crFreeVal(&g1);
+	crFreeVal(&g2);
+
+	return (struct CrErr){0};
+}
+
+static
 struct CrErr AT(struct CrState *state) {
 	CHECKOUT(crEval(state, state->group));
 	return (struct CrErr){0};
@@ -461,6 +487,7 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "apply"       , apply                    );
 	crStateAddBuiltin(state, "@"           , AT                       );
 	crStateAddBuiltin(state, "branch"      , branch                   );
+	crStateAddBuiltin(state, "while"       , while_                   );
 	crStateAddBuiltin(state, "awas"        , awas                     );
 	crStateAddBuiltin(state, "dup"         , dup                      );
 	crStateAddBuiltin(state, "swap"        , swap                     );

@@ -47,7 +47,7 @@ notation: `( input -- output )`
 * `%/   ( r -- )` - set the mark to the match of r
 * `%%/  ( r -- )` - extend the mark to the end of match of r
 
-* `@%.  ( -- t )` -   pushes the marked content to the stack
+* `@%.  ( -- t )` - pushes the marked content to the stack
 
 ### Flow control:
 

@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "");
 
-	char *buf = "0 { dup multiply } 'square bind 3 square dump";
+	char *buf = "0 10 { 1 minus dup } { dump } while";
 	/*do {
 		crLexNext(&lex);
 		printf("tok: %d %.*s\n", lex.tok.raw.s, lex.tok.raw.s, lex.tok.raw.p);
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "\n");
 	}
 
-	crGroupPrint(stderr, g);
+	//crGroupPrint(stderr, g);
 
 	struct CrState s;
 	crStateInit(&s);

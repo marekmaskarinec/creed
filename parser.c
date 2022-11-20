@@ -11,7 +11,6 @@ void pgToG(struct CrGroup *g, struct CrParGroup *pg) {
 	g->len = 0;
 	for (struct CrParGroup *c = pg; c; c = c->next)
 		++g->len;
-	printf("len %d\n", g->len);
 
 	g->toks = calloc(sizeof(struct CrGroup *), g->len);
 
@@ -44,7 +43,6 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 
 		switch (lex->tok.kind) {
 		case CrTokGroupBegin: {
-			printf("par group\n");
 			CHECKOUT(parse(lex, &tok->group, level + 1));
 			break;
 
