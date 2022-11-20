@@ -30,7 +30,6 @@ notation: `( input -- output )`
 	* `g` is a group
 	* `r` is a regex (still text)
 
-
 ### Insert commands:
 
 * `s ( t -- )` - substitute the marked text with t
@@ -55,8 +54,10 @@ notation: `( input -- output )`
 * `apply  ( g -- )` -   apply g
 * `@      ( -- )` -     apply the current group recursively
 * `branch ( ngg -- )` - apply the first g if n is non zero, else apply the second g
+* `while  ( gg -- )` -  while the top of the stack after running group 1 is 1,
+                        runs group 2
 * `awas   ( g -- )` -   apply with altered state - applies the group with the marked
-                  text as the buffer, and then substitutes it back
+                        text as the buffer, and then substitutes it back
 
 ### Stack operation:
 

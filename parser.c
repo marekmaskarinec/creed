@@ -11,6 +11,7 @@ void pgToG(struct CrGroup *g, struct CrParGroup *pg) {
 	g->len = 0;
 	for (struct CrParGroup *c = pg; c; c = c->next)
 		++g->len;
+	printf("len %d\n", g->len);
 
 	g->toks = calloc(sizeof(struct CrGroup *), g->len);
 
@@ -43,17 +44,13 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 
 		switch (lex->tok.kind) {
 		case CrTokGroupBegin: {
+			printf("par group\n");
 			CHECKOUT(parse(lex, &tok->group, level + 1));
 			break;
 
 		} case CrTokGroupEnd: {
-			if (prev && prev->next) {
-				free(prev->next);
-				prev->next = NULL;
-			}
-
 			ASSERT(level == 0, CrErrUnexpectedToken, *tok);
-			return (struct CrErr){ .kind = CrErrNull };
+			goto RET;
 		
 		} case CrTokString: {
 			tok->str = crUTF8ToSlice(tok->raw.p, (size_t)tok->raw.s);
@@ -91,6 +88,9 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 		crLexNext(lex);
 	}
 
+	ASSERT(level > 0, CrErrUnterminatedGroup, lex->tok);
+
+RET:
 	if (prev && prev->next) {
 		free(group);
 		prev->next = NULL;
@@ -99,7 +99,6 @@ struct CrErr parse(struct CrLex *lex, struct CrGroup *out, int level) {
 	pgToG(out, &pgOut);
 	crFreeParGroup(&pgOut);
 
-	ASSERT(level > 0, CrErrUnterminatedGroup, lex->tok);
 	return (struct CrErr){ .kind = CrErrNull };
 }
 

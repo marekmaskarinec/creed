@@ -27,6 +27,7 @@ struct CrSym *crDupSym(struct CrSym *t, struct CrSym *s) {
 struct CrGroup *crDupGroup(struct CrGroup *t, struct CrGroup *g) {
 	*t = *g;
 
+	printf("copying group of len %d\n", t->len);
 	t->toks = calloc(sizeof(struct CrTok *), t->len);
 	for (int i=0; i < t->len; ++i) {
 		t->toks[i] = calloc(sizeof(struct CrTok), 1);
@@ -37,7 +38,7 @@ struct CrGroup *crDupGroup(struct CrGroup *t, struct CrGroup *g) {
 }
 
 struct CrTok *crDupTok(struct CrTok *tgt, struct CrTok *t) {
-	printf("%p <- %p\n", tgt, t);
+	printf("copying tok from %p to %p\n", t, tgt);
 	*tgt = *t;
 
 	switch (t->kind) {
