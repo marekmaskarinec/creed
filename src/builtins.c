@@ -164,6 +164,8 @@ struct CrErr apply(struct CrState *state) {
 
 	CHECKOUT(crEval(state, &v.group));
 
+	crFreeVal(&v);
+
 	return (struct CrErr){0};
 }
 
