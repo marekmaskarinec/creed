@@ -1,2 +1,4 @@
 creed
+libcreed.a
+src/*.o
 *.swp
