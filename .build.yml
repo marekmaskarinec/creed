@@ -1,0 +1,13 @@
+image: archlinux
+packages:
+  - clang
+  - make
+sources:
+  - https://git.sr.ht/~mrms/creed
+tasks:
+  - build: |
+      cd creed
+      make
+  - tests: |
+      cd creed
+      ./runtests
