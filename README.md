@@ -79,6 +79,7 @@ like in forth.
 * `read    ( t -- )` -   reads contents of a file onto the stack
 * `write   ( tt -- )` -  writes text from the stack to a file, rewrites
 * `writea  ( tt -- )` -  writes text from the stack to a file, appends
+* `!       ( t -- t )` -  executes a shell command and pushes the `stdout`
 
 ### Math:
 

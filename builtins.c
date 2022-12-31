@@ -5,13 +5,6 @@
 #include <creed.h>
 
 static
-struct CrErr hello_world(struct CrState *state) {
-	printf("hello world\n");
-
-	return (struct CrErr){ .kind = CrErrNull };
-}
-
-static
 struct CrErr dump(struct CrState *state) {
 	fprintf(stderr, "<%ld> ", state->stack - state->stackBase + 1);
 
@@ -470,8 +463,36 @@ struct CrErr bind(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr EXCLAMATIONMARK(struct CrState *state) {
+	struct CrVal v;
+	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
+
+	char *com = crWsToMb(v.str);
+	FILE *f = popen(com, "r");
+
+	char str[BUFSIZ];
+	char *head = str;
+	char c;
+	while ((c = fgetc(f)) != EOF) {
+		*head = c;
+		head++;
+	}
+	*head = 0;
+
+	CHECKOUT(crStatePush(state, (struct CrVal){
+		.str = crUTF8ToSlice(str, head - str),
+		.kind = CrValStr
+	}));
+
+	crFreeVal(&v);
+	free(com);
+	pclose(f);
+
+	return (struct CrErr){0};
+}	
+
 void crAttachBuiltins(struct CrState *state) {
-	crStateAddBuiltin(state, "hello-world" , hello_world              );
 	crStateAddBuiltin(state, "dump"        , dump                     );
 	crStateAddBuiltin(state, "drop"        , drop                     );
 	crStateAddBuiltin(state, "s"           , s                        );
@@ -510,5 +531,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "lesser"      , lesser                   );
 	crStateAddBuiltin(state, "greater"     , greater                  );
 	crStateAddBuiltin(state, "bind"        , bind                     );
+	crStateAddBuiltin(state, "!"           , EXCLAMATIONMARK          );
 }
 
