@@ -1,5 +1,6 @@
 #include <regex.h>
 #include <string.h>
+#include <locale.h>
 
 #include <creed.h>
 
@@ -79,12 +80,14 @@ void crStateSubst(struct CrState *state, CrSlice(wchar_t) mark, CrSlice(wchar_t)
 	const wchar_t *markEnd = mark.p + mark.s;
 	const size_t markIdx = mark.p - state->buf.p;
 
-	memcpy(p, state->buf.p, markIdx * sizeof(wchar_t));
+	if (markIdx > 0)
+		memcpy(p, state->buf.p, markIdx * sizeof(wchar_t));
 	memcpy(p + markIdx, text.p, text.s * sizeof(wchar_t));
-	memcpy(
-	       p + markIdx + text.s,
-	       markEnd,
-	       (bufEnd - markEnd + 1) * sizeof(wchar_t));
+	if (markEnd < bufEnd)
+		memcpy(
+					 p + markIdx + text.s,
+					 markEnd,
+					 (bufEnd - markEnd) * sizeof(wchar_t));
 
 	free(state->buf.p);
 	state->buf.p = p;
@@ -95,7 +98,7 @@ void crStateSubst(struct CrState *state, CrSlice(wchar_t) mark, CrSlice(wchar_t)
 }
 
 struct CrErr crStatePop(struct CrState *state, struct CrVal *out) {
-	ASSERT(state->stack <= state->stackBase, CrErrStackUnderflow, *state->tok);
+	ASSERT(state->stack < state->stackBase, CrErrStackUnderflow, *state->tok);
 
 	*out = *state->stack;
 	--state->stack;
@@ -174,4 +177,32 @@ struct CrErr crStateMatch(struct CrState *state, CrSlice(wchar_t) *out, CrSlice(
 	free(pat);
 
 	return (struct CrErr){0};
+}
+
+int crRunStr(struct CrState *out, char *buf, char *prog) {
+	setlocale(LC_ALL, "");
+
+	struct CrGroup g;
+	struct CrErr e = crParseStr(prog, &g);
+	if (e.kind) {
+		crErrPrint(stderr, e);
+		fprintf(stderr, "\n");
+		return 1;
+	}
+
+	struct CrState s;
+	crStateInit(&s);
+	crStateSetBuf(&s, buf);
+
+	e = crEval(&s, &g);
+	if (e.kind) {
+		crErrPrint(stderr, e);
+		fprintf(stderr, "\n");
+		return 1;
+	}
+
+	crFreeGroup(&g);
+
+	*out = s;
+	return 0;
 }

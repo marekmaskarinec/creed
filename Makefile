@@ -1,9 +1,9 @@
 
 SRC=$(wildcard src/*.c)
 OBJ=$(sort $(SRC:.c=.o))
-HEADER=include/creed.h
 LIB=libcreed.a
 BIN=creed
+HEADER=include/creed.h
 CC=clang
 CFLAGS= \
 	-Iinclude \
@@ -14,15 +14,24 @@ CFLAGS= \
 	-fsanitize=address
 LD= -lm
 
-.PHONY: all clean
-all: $(BIN)
+TEST_SRC=$(wildcard tests/*.c)
+TESTS=$(sort $(TEST_SRC:.c=.test))
+
+.PHONY: all clean tests
+all: $(BIN) tests
 
 clean:
-	@rm -rf $(OBJ) $(BIN) $(LIB)
+	@rm -rf $(OBJ) $(BIN) $(LIB) $(TESTS)
 
 %.o: %.c $(HEADER)
 	@echo CC $@
 	@$(CC) $(CFLAGS) -o $@ -c $<
+
+%.test: %.c $(LIB)
+	@echo CC $@
+	@$(CC) $(CFLAGS) $(LD) -o $@ $< $(LIB)
+
+tests: $(TESTS) ;
 
 $(LIB): $(OBJ)
 	@echo LD $@

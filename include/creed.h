@@ -165,6 +165,7 @@ struct CrErr crStatePop(struct CrState *state, struct CrVal *out);
 struct CrErr crStatePopTyped(struct CrState *state, struct CrVal *out, enum CrValKind type);
 CrSlice(wchar_t) crStateFixMark(struct CrState *state, CrSlice(wchar_t) mark);
 struct CrErr crStateMatch(struct CrState *state, CrSlice(wchar_t) *out, CrSlice(wchar_t) pattern);
+int crRunStr(struct CrState *out, char *buf, char *prog);
 
 void crAttachBuiltins(struct CrState *state);
 

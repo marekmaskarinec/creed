@@ -1,0 +1,12 @@
+#!/bin/sh
+
+make -s tests
+for t in tests/*.test; do
+	if ./$t; then
+		echo -n .
+	else
+		echo -n X
+	fi
+done
+
+echo
