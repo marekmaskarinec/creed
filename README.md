@@ -75,7 +75,6 @@ like in forth.
 ### IO:
 
 * `parse   ( t -- g )` - parses a string into a group
-
 * `read    ( t -- )` -   reads contents of a file onto the stack
 * `write   ( tt -- )` -  writes text from the stack to a file, rewrites
 * `writea  ( tt -- )` -  writes text from the stack to a file, appends
