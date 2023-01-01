@@ -58,6 +58,8 @@ notation: `( input -- output )`
                         runs group 2
 * `awas   ( g -- )` -   apply with altered state - applies the group with the marked
                         text as the buffer, and then substitutes it back
+* `awsb   ( tg -- t )` - apply with string buffer - applies the group with a
+  string as the buffer.  Then pushes the buffer back to the stack.
 
 ### Stack operation:
 

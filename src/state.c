@@ -169,7 +169,7 @@ struct CrErr crStateMatch(struct CrState *state, CrSlice(wchar_t) *out, CrSlice(
 		CHECKOUT(match(preg, buf, &m));
 	}
 
-	out->p = m.s == 0 ? 0 : state->buf.p + (int)m.p;
+	out->p = state->buf.p + (int)m.p;
 	out->s = m.s;
 
 	regfree(&preg);

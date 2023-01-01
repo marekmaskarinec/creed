@@ -527,6 +527,30 @@ struct CrErr put(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr awsb(struct CrState *state) {
+	struct CrVal g, t;
+	CHECKOUT(crStatePopTyped(state, &g, CrValGroup));
+	CHECKOUT(crStatePopTyped(state, &t, CrValStr));
+
+	const CrSlice(wchar_t) buf = state->buf;
+	const CrSlice(wchar_t) mark = state->mark;
+	state->buf = t.str;
+	state->mark = t.str;
+
+	CHECKOUT(crEval(state, &g.group));
+
+	t.str = state->buf;
+	CHECKOUT(crStatePush(state, t));
+
+	state->buf = buf;
+	state->mark = mark;
+
+	crFreeVal(&g);
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "dump"     , dump                );
 	crStateAddBuiltin(state, "drop"     , drop                );
@@ -569,5 +593,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "!"        , EXCLAMATIONMARK     );
 	crStateAddBuiltin(state, "repr"     , repr                );
 	crStateAddBuiltin(state, "put"      , put                 );
+	crStateAddBuiltin(state, "awsb"     , awsb                );
 }
 
