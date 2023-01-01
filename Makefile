@@ -18,7 +18,7 @@ TEST_SRC=$(wildcard tests/*.c)
 TESTS=$(sort $(TEST_SRC:.c=.test))
 
 .PHONY: all clean tests
-all: $(BIN) tests
+all: $(BIN)
 
 clean:
 	@rm -rf $(OBJ) $(BIN) $(LIB) $(TESTS)
