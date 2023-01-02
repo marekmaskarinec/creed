@@ -121,7 +121,7 @@ struct CrErr PERCENTSLASH(struct CrState *state) {
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 
 	CrSlice(wchar_t) m;
-	CHECKOUT(crStateMatch(state, &m, v.str));
+	CHECKOUT(crStateMatch(state, &m, v.str, true));
 	state->mark = m;
 
 	crFreeVal(&v);
@@ -134,7 +134,7 @@ struct CrErr PERCENTPERCENTSLASH(struct CrState *state) {
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 
 	CrSlice(wchar_t) m;
-	CHECKOUT(crStateMatch(state, &m, v.str));
+	CHECKOUT(crStateMatch(state, &m, v.str, true));
 
 	if (m.p > state->mark.p) {
 		state->mark.s = m.p - state->mark.p + m.s;
@@ -551,6 +551,23 @@ struct CrErr awsb(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr SLASHQUESTIONMARK(struct CrState *state) {
+	struct CrVal r;
+	CHECKOUT(crStatePopTyped(state, &r, CrValStr));
+	CrSlice(wchar_t) out;
+
+	CHECKOUT(crStateMatch(state, &out, r.str, false));
+	CHECKOUT(crStatePush(state, (struct CrVal){
+		.num = out.s == 0 ? 0 : 1,
+		.kind = CrValNum
+	}));
+
+	crFreeVal(&r);
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "dump"     , dump                );
 	crStateAddBuiltin(state, "drop"     , drop                );
@@ -594,5 +611,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "repr"     , repr                );
 	crStateAddBuiltin(state, "put"      , put                 );
 	crStateAddBuiltin(state, "awsb"     , awsb                );
+	crStateAddBuiltin(state, "/?"       , SLASHQUESTIONMARK   );
 }
 

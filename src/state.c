@@ -146,7 +146,12 @@ struct CrErr match(regex_t reg, const char *buf, CrSlice(wchar_t) *out) {
 	return (struct CrErr){0};
 }
 
-struct CrErr crStateMatch(struct CrState *state, CrSlice(wchar_t) *out, CrSlice(wchar_t) pattern) {
+struct CrErr crStateMatch(
+	struct CrState *state,
+	CrSlice(wchar_t) *out,
+	CrSlice(wchar_t) pattern,
+	bool backwards
+) {
 	char *pat = crWsToMb(pattern);
 
 	regex_t preg;
@@ -159,7 +164,7 @@ struct CrErr crStateMatch(struct CrState *state, CrSlice(wchar_t) *out, CrSlice(
 
 	CrSlice(wchar_t) m = {0};
 	CHECKOUT(match(preg, buf, &m));
-	if (m.s == 0 && state->mark.p > state->buf.p) {
+	if (m.s == 0 && state->mark.p > state->buf.p && backwards) {
 		free(buf);
 		buf = crWsToMb((CrSlice(wchar_t)){
 			.p = state->buf.p,

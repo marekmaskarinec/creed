@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define CHECKOUT(e) do { if ((e).kind != CrErrNull) { printf("%s:%d\n", __FILE__, __LINE__); return e; } } while (0)
 #define ASSERT(a, e, t) do { if ((a)) { CHECKOUT( ((struct CrErr) { (e), (t) }) ); } } while (0)
@@ -164,7 +165,12 @@ void crStateSubst(struct CrState *state, CrSlice(wchar_t) mark, CrSlice(wchar_t)
 struct CrErr crStatePop(struct CrState *state, struct CrVal *out);
 struct CrErr crStatePopTyped(struct CrState *state, struct CrVal *out, enum CrValKind type);
 CrSlice(wchar_t) crStateFixMark(struct CrState *state, CrSlice(wchar_t) mark);
-struct CrErr crStateMatch(struct CrState *state, CrSlice(wchar_t) *out, CrSlice(wchar_t) pattern);
+struct CrErr crStateMatch(
+	struct CrState *state,
+	CrSlice(wchar_t) *out,
+	CrSlice(wchar_t) pattern,
+	bool backwards
+);
 int crRunStr(struct CrState *out, char *buf, char *prog);
 
 void crAttachBuiltins(struct CrState *state);
