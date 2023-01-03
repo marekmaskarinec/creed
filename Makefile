@@ -12,7 +12,7 @@ CFLAGS= \
 	-Wno-unused-label \
 	-Wno-pointer-to-int-cast \
 	-fsanitize=address
-LD= -lm
+LD= -lm -lreadline
 
 TEST_SRC=$(wildcard tests/*.c)
 TESTS=$(sort $(TEST_SRC:.c=.test))
@@ -37,6 +37,6 @@ $(LIB): $(OBJ)
 	@echo LD $@
 	@ar rcs $@ $(OBJ)
 
-$(BIN): $(LIB)
+$(BIN): $(LIB) main.c
 	@echo LD $@
 	@$(CC) $(CFLAGS) $(LD) -o $@ $(OBJ) main.c
