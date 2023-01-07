@@ -1,8 +1,9 @@
 #!/bin/sh
 
+rm -f testout
 make -s tests
 for t in tests/*.test; do
-	if ./$t; then
+	if ./$t 2>&1 >> testout; then
 		echo -n .
 	else
 		echo -n X
@@ -10,3 +11,6 @@ for t in tests/*.test; do
 done
 
 echo
+
+cat testout
+rm -f testout

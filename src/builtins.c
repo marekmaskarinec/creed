@@ -598,6 +598,24 @@ struct CrErr mbegin(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr mcl(struct CrState *state) {
+	for (;
+		state->mark.p > state->buf.p && *state->mark.p != '\n';
+		--state->mark.p
+	) ;
+
+	for (;
+		state->mark.p + state->mark.s < state->buf.p + state->buf.s;
+		++state->mark.s
+	) {
+		if (*(state->mark.p + state->mark.s) == '\n')
+			break;
+	}
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "dump"   , dump   );
 	crStateAddBuiltin(state, "drop"   , drop   );
@@ -647,5 +665,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "mall"   , mall   );
 	crStateAddBuiltin(state, "mend"   , mend   );
 	crStateAddBuiltin(state, "mbegin" , mbegin );
+	crStateAddBuiltin(state, "mcl"    , mcl    );
 }
 
