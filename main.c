@@ -70,11 +70,18 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	/*while (optind < argc)
+	struct CrState s;
+	crStateInit(&s);
+	crStateSetBuf(&s, bd);
+
+	while (optind < argc) {
 		crStatePush(&s, (struct CrVal) {
 			.str = crUTF8ToSlice(argv[optind], strlen(argv[optind])),
 			.kind = CrValStr
-		});*/
+		});
+
+		++optind;
+	}
 
 	if (!repl) {
 		if (command == NULL) {
@@ -86,22 +93,27 @@ int main(int argc, char *argv[]) {
 			command = crReadAll(script);
 		}
 
-		struct CrState s;
-		int res = crRunStr(&s, bd, command);
+		struct CrGroup g;
+		struct CrErr err = crParseStr(command, &g);
+		if (err.kind) {
+			crErrPrint(stderr, err);
+			crFreeGroup(&g);
+			goto fail;
+		}
+
+		err = crEval(&s, &g);
+		if (err.kind) {
+			crErrPrint(stderr, err);
+			crFreeGroup(&g);
+			goto fail;
+		}
 
 		printf("%.*ls\n", (int)s.buf.s, s.buf.p);
-
-		crFreeState(&s);
-
-		if (res)
-			goto fail;
-		else
-			goto cleanup;
+		crFreeGroup(&g);
+		goto cleanup;
 	}
 
-	struct CrState s;
-	crStateInit(&s);
-	crStateSetBuf(&s, bd);
+	printf("CREED. Visit the website for help. mrms.cz/creed\n");
 
 	for (;;) {
 		char *c = readline(">> ");
@@ -112,23 +124,26 @@ int main(int argc, char *argv[]) {
 		struct CrErr err = crParseStr(c, &g);
 		if (err.kind) {
 			crErrPrint(stderr, err);
-			goto fail;
+			goto loopEnd;
 		}
 
 		err = crEval(&s, &g);
 		if (err.kind) {
 			crErrPrint(stderr, err);
-			goto fail;
+			goto loopEnd;
 		}
 
+loopEnd:
+		crFreeGroup(&g);
 		free(c);
 	}
 
-	crFreeState(&s);
-
 cleanup:
+	crFreeState(&s);
 	if (strlen(bd))
 		free(bd);
+	if (script && command)
+		free(command);
 
 	return 0;
 

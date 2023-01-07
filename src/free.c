@@ -70,6 +70,9 @@ void crFreeVal(struct CrVal *v) {
 void crFreeState(struct CrState *s) {
 	free(s->buf.p);
 
+	while (s->stack >= s->stackBase)
+		crFreeVal(s->stack--);
+
 	crFreeHashMap(&s->builtins);
 	crFreeHashMap(&s->syms);
 }
