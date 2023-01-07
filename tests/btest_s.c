@@ -5,7 +5,7 @@
 
 int main() {
 	struct CrState s;
-	if (crRunStr(&s, "aaaacc", "2 % 2 %% \"bb\" s"))
+	if (crRunStr(&s, "aaaacc", "2 amp 2 aml \"bb\" s"))
 		return 1;
 
 	CrSlice(wchar_t) exp = crUTF8ToSlice("aabb", 4);

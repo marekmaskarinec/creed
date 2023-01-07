@@ -5,7 +5,7 @@
 
 int main() {
 	struct CrState s;
-	if (crRunStr(&s, "", "10 { 1 minus dup } { \".\" a } while"))
+	if (crRunStr(&s, "", "10 { 1 sub dup } { \".\" a } while"))
 		return 1;
 
 	CrSlice(wchar_t) exp = crUTF8ToSlice(".........", 9);

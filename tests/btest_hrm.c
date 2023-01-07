@@ -5,7 +5,7 @@
 
 int main() {
 	struct CrState s;
-	if (crRunStr(&s, "aa bb cc", "%all \"bb\" %/ %end \"aa\" /? \"cc\" /?"))
+	if (crRunStr(&s, "aa bb cc", "mall \"bb\" mrm mend \"aa\" hrm \"cc\" hrm"))
 		return 1;
 
 	assert(s.stackBase[0].kind == CrValNum);

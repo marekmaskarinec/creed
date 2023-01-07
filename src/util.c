@@ -85,7 +85,7 @@ struct CrErr crRegexMatch(
 	int rc = pcre2_match(code, (PCRE2_SPTR)buf.p, buf.s, 0, 0, data, NULL);
 
 	PCRE2_SIZE *offsets = pcre2_get_ovector_pointer(data);
-	uint32_t count = pcre2_get_ovector_count(data);
+	pcre2_get_ovector_count(data);
 
 	if (rc < 0)
 		goto end;

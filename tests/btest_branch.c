@@ -6,7 +6,7 @@
 int main() {
 	struct CrState s;
 	if (crRunStr(&s, "",
-		"4 { 1 minus dup } { dup 2 modulo { \"*\" a } { \"+\" a } branch } while"))
+		"4 { 1 sub dup } { dup 2 mod { \"*\" a } { \"+\" a } branch } while"))
 			return 1;
 
 	CrSlice(wchar_t) exp = crUTF8ToSlice("*+*", 3);

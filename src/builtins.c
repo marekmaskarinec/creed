@@ -74,7 +74,7 @@ struct CrErr p(struct CrState *state) {
 }
 
 static
-struct CrErr PERCENT(struct CrState *state) {
+struct CrErr amp(struct CrState *state) {
 	struct CrVal v;
 	CHECKOUT(crStatePopTyped(state, &v, CrValNum));
 
@@ -85,7 +85,7 @@ struct CrErr PERCENT(struct CrState *state) {
 }
 
 static
-struct CrErr PERCENTDOT(struct CrState *state) {
+struct CrErr pmp(struct CrState *state) {
 	CHECKOUT(crStatePush(state, (struct CrVal){
 		.kind = CrValNum,
 		.num = state->mark.p - state->buf.p
@@ -95,7 +95,7 @@ struct CrErr PERCENTDOT(struct CrState *state) {
 }
 
 static
-struct CrErr PERCENTPERCENT(struct CrState *state) {
+struct CrErr aml(struct CrState *state) {
 	struct CrVal v;
 	CHECKOUT(crStatePopTyped(state, &v, CrValNum));
 
@@ -106,7 +106,7 @@ struct CrErr PERCENTPERCENT(struct CrState *state) {
 }
 
 static
-struct CrErr PERCENTPERCENTDOT(struct CrState *state) {
+struct CrErr pml(struct CrState *state) {
 	CHECKOUT(crStatePush(state, (struct CrVal){
 		.kind = CrValNum,
 		.num = state->mark.s
@@ -116,7 +116,7 @@ struct CrErr PERCENTPERCENTDOT(struct CrState *state) {
 }
 
 static
-struct CrErr PERCENTSLASH(struct CrState *state) {
+struct CrErr mrm(struct CrState *state) {
 	struct CrVal v;
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 
@@ -130,7 +130,7 @@ struct CrErr PERCENTSLASH(struct CrState *state) {
 }
 
 static
-struct CrErr PERCENTPERCENTSLASH(struct CrState *state) {
+struct CrErr emrm(struct CrState *state) {
 	struct CrVal v;
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 
@@ -157,7 +157,7 @@ struct CrErr PERCENTPERCENTSLASH(struct CrState *state) {
 }
 
 static
-struct CrErr ATPERCENTDOT(struct CrState *state) {
+struct CrErr pm(struct CrState *state) {
 	CHECKOUT(crStatePush(state, (struct CrVal){
 		.kind = CrValStr,
 		.str = crStrDup(state->mark)
@@ -224,13 +224,13 @@ struct CrErr while_(struct CrState *state) {
 }
 
 static
-struct CrErr AT(struct CrState *state) {
+struct CrErr rec(struct CrState *state) {
 	CHECKOUT(crEval(state, state->group));
 	return (struct CrErr){0};
 }
 
 static
-struct CrErr awas(struct CrState *state) {
+struct CrErr awmb(struct CrState *state) {
 	struct CrVal g;
 	CHECKOUT(crStatePopTyped(state, &g, CrValGroup));
 
@@ -419,17 +419,19 @@ struct CrErr name(struct CrState *state) {        \
 	return (struct CrErr){0};                       \
 }
 
-ARITHMETIC(plus, +);
-ARITHMETIC(minus, -);
-ARITHMETIC(multiply, *);
+ARITHMETIC(add, +);
+ARITHMETIC(sub, -);
+ARITHMETIC(mul, *);
 ARITHMETIC(and, &&);
 ARITHMETIC(or, ||);
-ARITHMETIC(equal, ==);
-ARITHMETIC(lesser, <);
-ARITHMETIC(greater, >);
+ARITHMETIC(eq, ==);
+ARITHMETIC(lt, <);
+ARITHMETIC(gt, >);
+ARITHMETIC(le, <=);
+ARITHMETIC(ge, >=);
 
 static
-struct CrErr divide(struct CrState *state) {
+struct CrErr div_(struct CrState *state) {
 	struct CrVal a, b;
 	CHECKOUT(crStatePopTyped(state, &b, CrValNum));
 	CHECKOUT(crStatePopTyped(state, &a, CrValNum));
@@ -444,7 +446,7 @@ struct CrErr divide(struct CrState *state) {
 }
 
 static
-struct CrErr modulo(struct CrState *state) {
+struct CrErr mod(struct CrState *state) {
 	struct CrVal a, b;
 	CHECKOUT(crStatePopTyped(state, &b, CrValNum));
 	CHECKOUT(crStatePopTyped(state, &a, CrValNum));
@@ -475,7 +477,7 @@ struct CrErr bind(struct CrState *state) {
 }
 
 static
-struct CrErr EXCLAMATIONMARK(struct CrState *state) {
+struct CrErr shell(struct CrState *state) {
 	struct CrVal v;
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 
@@ -537,7 +539,7 @@ struct CrErr put(struct CrState *state) {
 }
 
 static
-struct CrErr awsb(struct CrState *state) {
+struct CrErr awtb(struct CrState *state) {
 	struct CrVal g, t;
 	CHECKOUT(crStatePopTyped(state, &g, CrValGroup));
 	CHECKOUT(crStatePopTyped(state, &t, CrValStr));
@@ -561,7 +563,7 @@ struct CrErr awsb(struct CrState *state) {
 }
 
 static
-struct CrErr SLASHQUESTIONMARK(struct CrState *state) {
+struct CrErr hrm(struct CrState *state) {
 	struct CrVal r;
 	CHECKOUT(crStatePopTyped(state, &r, CrValStr));
 	CrSlice(wchar_t) out;
@@ -578,70 +580,72 @@ struct CrErr SLASHQUESTIONMARK(struct CrState *state) {
 }
 
 static
-struct CrErr PERCENTall(struct CrState *state) {
+struct CrErr mall(struct CrState *state) {
 	state->mark = state->buf;
 	return (struct CrErr){0};
 }
 
 static
-struct CrErr PERCENTend(struct CrState *state) {
+struct CrErr mend(struct CrState *state) {
 	state->mark.s = state->buf.p + state->buf.s - state->mark.p;
 	return (struct CrErr){0};
 }
 
 static
-struct CrErr PERCENTbegin(struct CrState *state) {
+struct CrErr mbegin(struct CrState *state) {
 	state->mark.s = state->mark.s + state->mark.p - state->buf.p;
 	state->mark.p = state->buf.p;
 	return (struct CrErr){0};
 }
 
 void crAttachBuiltins(struct CrState *state) {
-	crStateAddBuiltin(state, "dump"     , dump                );
-	crStateAddBuiltin(state, "drop"     , drop                );
-	crStateAddBuiltin(state, "s"        , s                   );
-	crStateAddBuiltin(state, "a"        , a                   );
-	crStateAddBuiltin(state, "p"        , p                   );
-	crStateAddBuiltin(state, "%"        , PERCENT             );
-	crStateAddBuiltin(state, "%."       , PERCENTDOT          );
-	crStateAddBuiltin(state, "%%"       , PERCENTPERCENT      );
-	crStateAddBuiltin(state, "%%."      , PERCENTPERCENTDOT   );
-	crStateAddBuiltin(state, "%/"       , PERCENTSLASH        );
-	crStateAddBuiltin(state, "%%/"      , PERCENTPERCENTSLASH );
-	crStateAddBuiltin(state, "@%."      , ATPERCENTDOT        );
-	crStateAddBuiltin(state, "apply"    , apply               );
-	crStateAddBuiltin(state, "@"        , AT                  );
-	crStateAddBuiltin(state, "branch"   , branch              );
-	crStateAddBuiltin(state, "while"    , while_              );
-	crStateAddBuiltin(state, "awas"     , awas                );
-	crStateAddBuiltin(state, "dup"      , dup                 );
-	crStateAddBuiltin(state, "swap"     , swap                );
-	crStateAddBuiltin(state, "rot"      , rot                 );
-	crStateAddBuiltin(state, "tuck"     , tuck                );
-	crStateAddBuiltin(state, "over"     , over                );
-	crStateAddBuiltin(state, "parse"    , parse               );
-	crStateAddBuiltin(state, "read"     , read                );
-	crStateAddBuiltin(state, "write"    , write               );
-	crStateAddBuiltin(state, "writea"   , writea              );
-	crStateAddBuiltin(state, "neg"      , neg                 );
-	crStateAddBuiltin(state, "plus"     , plus                );
-	crStateAddBuiltin(state, "minus"    , minus               );
-	crStateAddBuiltin(state, "divide"   , divide              );
-	crStateAddBuiltin(state, "multiply" , multiply            );
-	crStateAddBuiltin(state, "modulo"   , modulo              );
-	crStateAddBuiltin(state, "and"      , and                 );
-	crStateAddBuiltin(state, "or"       , or                  );
-	crStateAddBuiltin(state, "equal"    , equal               );
-	crStateAddBuiltin(state, "lesser"   , lesser              );
-	crStateAddBuiltin(state, "greater"  , greater             );
-	crStateAddBuiltin(state, "bind"     , bind                );
-	crStateAddBuiltin(state, "!"        , EXCLAMATIONMARK     );
-	crStateAddBuiltin(state, "repr"     , repr                );
-	crStateAddBuiltin(state, "put"      , put                 );
-	crStateAddBuiltin(state, "awsb"     , awsb                );
-	crStateAddBuiltin(state, "/?"       , SLASHQUESTIONMARK   );
-	crStateAddBuiltin(state, "%all"     , PERCENTall          );
-	crStateAddBuiltin(state, "%end"     , PERCENTend          );
-	crStateAddBuiltin(state, "%begin"  , PERCENTbegin        );
+	crStateAddBuiltin(state, "dump"   , dump   );
+	crStateAddBuiltin(state, "drop"   , drop   );
+	crStateAddBuiltin(state, "s"      , s      );
+	crStateAddBuiltin(state, "a"      , a      );
+	crStateAddBuiltin(state, "p"      , p      );
+	crStateAddBuiltin(state, "amp"    , amp    );
+	crStateAddBuiltin(state, "pmp"    , pmp    );
+	crStateAddBuiltin(state, "aml"    , aml    );
+	crStateAddBuiltin(state, "pml"    , pml    );
+	crStateAddBuiltin(state, "mrm"    , mrm    );
+	crStateAddBuiltin(state, "emrm"   , emrm   );
+	crStateAddBuiltin(state, "pm"     , pm     );
+	crStateAddBuiltin(state, "apply"  , apply  );
+	crStateAddBuiltin(state, "rec"    , rec    );
+	crStateAddBuiltin(state, "branch" , branch );
+	crStateAddBuiltin(state, "while"  , while_ );
+	crStateAddBuiltin(state, "awmb"   , awmb   );
+	crStateAddBuiltin(state, "dup"    , dup    );
+	crStateAddBuiltin(state, "swap"   , swap   );
+	crStateAddBuiltin(state, "rot"    , rot    );
+	crStateAddBuiltin(state, "tuck"   , tuck   );
+	crStateAddBuiltin(state, "over"   , over   );
+	crStateAddBuiltin(state, "parse"  , parse  );
+	crStateAddBuiltin(state, "read"   , read   );
+	crStateAddBuiltin(state, "write"  , write  );
+	crStateAddBuiltin(state, "writea" , writea );
+	crStateAddBuiltin(state, "neg"    , neg    );
+	crStateAddBuiltin(state, "add"    , add    );
+	crStateAddBuiltin(state, "sub"    , sub    );
+	crStateAddBuiltin(state, "div"    , div_   );
+	crStateAddBuiltin(state, "mul"    , mul    );
+	crStateAddBuiltin(state, "mod"    , mod    );
+	crStateAddBuiltin(state, "and"    , and    );
+	crStateAddBuiltin(state, "or"     , or     );
+	crStateAddBuiltin(state, "eq"     , eq     );
+	crStateAddBuiltin(state, "lt"     , lt     );
+	crStateAddBuiltin(state, "gt"     , gt     );
+	crStateAddBuiltin(state, "ge"     , ge     );
+	crStateAddBuiltin(state, "le"     , le     );
+	crStateAddBuiltin(state, "bind"   , bind   );
+	crStateAddBuiltin(state, "shell"  , shell  );
+	crStateAddBuiltin(state, "repr"   , repr   );
+	crStateAddBuiltin(state, "put"    , put    );
+	crStateAddBuiltin(state, "awtb"   , awtb   );
+	crStateAddBuiltin(state, "hrm"    , hrm    );
+	crStateAddBuiltin(state, "mall"   , mall   );
+	crStateAddBuiltin(state, "mend"   , mend   );
+	crStateAddBuiltin(state, "mbegin" , mbegin );
 }
 
