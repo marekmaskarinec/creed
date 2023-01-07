@@ -12,7 +12,7 @@ CFLAGS= \
 	-Wno-unused-label \
 	-Wno-pointer-to-int-cast \
 	-fsanitize=address
-LD= -lm -lreadline
+LD= -lm -lreadline -lpcre2-32
 
 TEST_SRC=$(wildcard tests/*.c)
 TESTS=$(sort $(TEST_SRC:.c=.test))

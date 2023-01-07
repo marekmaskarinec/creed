@@ -139,6 +139,11 @@ unsigned crHash(CrSlice(char) s);
 char *crWsToMb(CrSlice(wchar_t) s);
 CrSlice(wchar_t) crStrDup(CrSlice(wchar_t) s);
 char *crReadAll(const char *path);
+struct CrErr crRegexMatch(
+	CrSlice(wchar_t) *m,
+	CrSlice(wchar_t) buf,
+	CrSlice(wchar_t) pat
+);
 
 size_t crUTF8Decode(wchar_t *out, const char *s_);
 CrSlice(wchar_t) crUTF8ToSlice(const char *ip, size_t is);
@@ -168,8 +173,7 @@ CrSlice(wchar_t) crStateFixMark(struct CrState *state, CrSlice(wchar_t) mark);
 struct CrErr crStateMatch(
 	struct CrState *state,
 	CrSlice(wchar_t) *out,
-	CrSlice(wchar_t) pattern,
-	bool backwards
+	CrSlice(wchar_t) pattern
 );
 int crRunStr(struct CrState *out, char *buf, char *prog);
 

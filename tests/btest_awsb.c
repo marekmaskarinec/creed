@@ -5,7 +5,7 @@
 
 int main() {
 	struct CrState s;
-	if (crRunStr(&s, "result: ", " \"aa\" { \"bb\" a } awsb \": \" %/ a"))
+	if (crRunStr(&s, "result: ", " \"aa\" { \"bb\" a } awsb %end \": \" %/ a"))
 		return 1;
 
 	CrSlice(wchar_t) exp = crUTF8ToSlice("result: aabb", 12);

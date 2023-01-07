@@ -125,61 +125,14 @@ CrSlice(wchar_t) crStateFixMark(struct CrState *state, CrSlice(wchar_t) mark) {
 	return mark;
 }
 
-static
-int wcIndex(const char *buf, int index) {
-	int out = 0;
-	for (int i=0; i < index; ++out)
-		i += mblen(&buf[i], index - i);
-
-	return out;
-}
-
-static
-struct CrErr match(regex_t reg, const char *buf, CrSlice(wchar_t) *out) {
-	regmatch_t m = {0};
-	if (regexec(&reg, buf, 1, &m, 0))
-		return (struct CrErr){0};
-
-	out->p = NULL + wcIndex(buf, m.rm_so);
-	out->s = wcIndex(buf, m.rm_eo) - (int)out->p;
-
-	return (struct CrErr){0};
-}
-
 struct CrErr crStateMatch(
 	struct CrState *state,
 	CrSlice(wchar_t) *out,
-	CrSlice(wchar_t) pattern,
-	bool backwards
+	CrSlice(wchar_t) pattern
 ) {
-	char *pat = crWsToMb(pattern);
-
-	regex_t preg;
-	ASSERT(regcomp(&preg, pat, REG_EXTENDED), CrErrRegexCompile, *state->tok);
-
-	char *buf = crWsToMb((CrSlice(wchar_t)){
-		.p = state->mark.p,
-		.s = state->buf.p + state->buf.s - state->mark.p
-	});
-
-	CrSlice(wchar_t) m = {0};
-	CHECKOUT(match(preg, buf, &m));
-	if (m.s == 0 && state->mark.p > state->buf.p && backwards) {
-		free(buf);
-		buf = crWsToMb((CrSlice(wchar_t)){
-			.p = state->buf.p,
-			.s = state->mark.p - state->buf.p
-		});
-
-		CHECKOUT(match(preg, buf, &m));
-	}
-
-	out->p = state->buf.p + (int)m.p;
-	out->s = m.s;
-
-	regfree(&preg);
-	free(buf);
-	free(pat);
+	struct CrErr err = crRegexMatch(out, state->mark, pattern);
+	if (err.kind)
+		err.tok = *state->tok;
 
 	return (struct CrErr){0};
 }

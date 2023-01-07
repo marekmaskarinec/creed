@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define PCRE2_CODE_UNIT_WIDTH 32
+#include <pcre2.h>
+
 #include <creed.h>
 
 void crFatal(char *msg, ...) {
@@ -55,4 +58,44 @@ char *crReadAll(const char *path) {
 	fread(buf, sizeof(char), s, f);	
 
 	return buf;
+}
+
+struct CrErr crRegexMatch(
+	CrSlice(wchar_t) *m,
+	CrSlice(wchar_t) buf,
+	CrSlice(wchar_t) pat
+) {
+	m->p = 0;
+	m->s = 0;
+	int err;
+	size_t errOff;
+	pcre2_code *code = pcre2_compile(
+		(PCRE2_SPTR)pat.p, pat.s, PCRE2_UTF, &err, &errOff, NULL);
+
+	if (err < 0) {
+		PCRE2_UCHAR errBuf[BUFSIZ];
+		pcre2_get_error_message(err, (PCRE2_UCHAR *)errBuf, BUFSIZ);
+		fprintf(stderr, "regex compile error: at %zu: %ls (%d)\n",
+			errOff, (wchar_t *)errBuf, err);
+		return (struct CrErr){ .kind = CrErrRegexCompile };
+	}
+
+	pcre2_match_data *data;
+	data = pcre2_match_data_create_from_pattern(code, NULL);
+	int rc = pcre2_match(code, (PCRE2_SPTR)buf.p, buf.s, 0, 0, data, NULL);
+
+	PCRE2_SIZE *offsets = pcre2_get_ovector_pointer(data);
+	uint32_t count = pcre2_get_ovector_count(data);
+
+	if (rc < 0)
+		goto end;
+
+	m->p = buf.p + offsets[0];
+	m->s = offsets[1] - offsets[0];
+
+end:
+	pcre2_code_free(code);
+	pcre2_match_data_free(data);
+
+	return (struct CrErr){0};
 }

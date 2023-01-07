@@ -121,8 +121,9 @@ struct CrErr PERCENTSLASH(struct CrState *state) {
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 
 	CrSlice(wchar_t) m;
-	CHECKOUT(crStateMatch(state, &m, v.str, true));
-	state->mark = m;
+	CHECKOUT(crStateMatch(state, &m, v.str));
+	if (m.p)
+		state->mark = m;
 
 	crFreeVal(&v);
 	return (struct CrErr){0};
@@ -134,7 +135,15 @@ struct CrErr PERCENTPERCENTSLASH(struct CrState *state) {
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 
 	CrSlice(wchar_t) m;
-	CHECKOUT(crStateMatch(state, &m, v.str, true));
+	struct CrErr err = crRegexMatch(
+		&m,
+		(CrSlice(wchar_t)){
+			.p = state->mark.p,
+			.s = state->buf.s + state->buf.p - state->mark.p
+		},
+		v.str);
+	if (err.kind)
+		err.tok = *state->tok;
 
 	if (m.p > state->mark.p) {
 		state->mark.s = m.p - state->mark.p + m.s;
@@ -557,7 +566,7 @@ struct CrErr SLASHQUESTIONMARK(struct CrState *state) {
 	CHECKOUT(crStatePopTyped(state, &r, CrValStr));
 	CrSlice(wchar_t) out;
 
-	CHECKOUT(crStateMatch(state, &out, r.str, false));
+	CHECKOUT(crStateMatch(state, &out, r.str));
 	CHECKOUT(crStatePush(state, (struct CrVal){
 		.num = out.s == 0 ? 0 : 1,
 		.kind = CrValNum
@@ -565,6 +574,25 @@ struct CrErr SLASHQUESTIONMARK(struct CrState *state) {
 
 	crFreeVal(&r);
 
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr PERCENTall(struct CrState *state) {
+	state->mark = state->buf;
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr PERCENTend(struct CrState *state) {
+	state->mark.s = state->buf.p + state->buf.s - state->mark.p;
+	return (struct CrErr){0};
+}
+
+static
+struct CrErr PERCENTbegin(struct CrState *state) {
+	state->mark.s = state->mark.s + state->mark.p - state->buf.p;
+	state->mark.p = state->buf.p;
 	return (struct CrErr){0};
 }
 
@@ -612,5 +640,8 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "put"      , put                 );
 	crStateAddBuiltin(state, "awsb"     , awsb                );
 	crStateAddBuiltin(state, "/?"       , SLASHQUESTIONMARK   );
+	crStateAddBuiltin(state, "%all"     , PERCENTall          );
+	crStateAddBuiltin(state, "%end"     , PERCENTend          );
+	crStateAddBuiltin(state, "%begin"  , PERCENTbegin        );
 }
 
