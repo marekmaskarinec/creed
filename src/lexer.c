@@ -20,6 +20,11 @@ int numberp(int c) {
 }
 
 static
+int commentp(int c) {
+	return c != '\n';
+}
+
+static
 char peekc(struct CrLex *lex) {
 	return lex->loc.idx >= lex->bufsiz ? 0 : lex->buf[lex->loc.idx];
 }
@@ -85,6 +90,9 @@ struct CrErr crLexNext(struct CrLex *lex) {
 		lex->tok.raw.s = eat(lex, symbolp);
 		lex->tok.kind = CrTokQuote;
 
+		break;
+	case ';':
+		eat(lex, commentp);
 		break;
 	default:
 		if (isdigit(peekc(lex)) || peekc(lex) == '-') {

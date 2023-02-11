@@ -270,8 +270,8 @@ struct CrErr swap(struct CrState *state) {
 	struct CrVal v2;
 	CHECKOUT(crStatePop(state, &v2));
 
-	CHECKOUT(crStatePush(state, v2));
 	CHECKOUT(crStatePush(state, v1));
+	CHECKOUT(crStatePush(state, v2));
 
 	return (struct CrErr){0};
 }
@@ -346,6 +346,7 @@ struct CrErr read(struct CrState *state) {
 	struct CrVal v;
 	CHECKOUT(crStatePopTyped(state, &v, CrValStr));
 	char *s = crWsToMb(v.str);
+	printf("%s %d\n", s, strlen(s));
 
 	char *f = crReadAll(s);
 	free(s);
@@ -616,6 +617,14 @@ struct CrErr mcl(struct CrState *state) {
 	return (struct CrErr){0};
 }
 
+static
+struct CrErr zme(struct CrState *state) {
+	state->mark.p += state->mark.s;
+	state->mark.s = 0;
+
+	return (struct CrErr){0};
+}
+
 void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "dump"   , dump   );
 	crStateAddBuiltin(state, "drop"   , drop   );
@@ -666,5 +675,6 @@ void crAttachBuiltins(struct CrState *state) {
 	crStateAddBuiltin(state, "mend"   , mend   );
 	crStateAddBuiltin(state, "mbegin" , mbegin );
 	crStateAddBuiltin(state, "mcl"    , mcl    );
+	crStateAddBuiltin(state, "zme"    , zme    );
 }
 

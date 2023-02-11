@@ -48,6 +48,10 @@ CrSlice(wchar_t) crStrDup(CrSlice(wchar_t) s) {
 
 char *crReadAll(const char *path) {
 	FILE *f = fopen(path, "r");
+	if (f == NULL) {
+		fprintf(stderr, "Could not open file %s %d\n", path, strlen(path));
+		exit(1);
+	}
 
 	fseek(f, 0, SEEK_END);
 	size_t s = ftell(f);
