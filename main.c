@@ -120,6 +120,11 @@ int main(int argc, char *argv[]) {
 		if (!c)
 			break;
 
+		if (strlen(c) == 0) {
+			free(c);
+			continue;
+		}
+
 		struct CrGroup g;
 		struct CrErr err = crParseStr(c, &g);
 		if (err.kind) {
